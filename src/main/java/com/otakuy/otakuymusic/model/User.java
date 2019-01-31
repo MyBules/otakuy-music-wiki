@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.otakuy.otakuymusic.model.security.Role;
 import lombok.*;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,9 +27,13 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
     @Id
     private String id;
+    @NotBlank
     private String username;
+    @NotBlank
     private String password;
+    @URL
     private String imgurl;
+    @Email
     private String email;
     private String intro;
     private String star;
