@@ -4,6 +4,7 @@ import com.otakuy.otakuymusic.exception.CheckException;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
+import com.otakuy.otakuymusic.model.security.Role;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.service.VerificationCodeService;
 import com.otakuy.otakuymusic.util.JWTUtil;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/users")
@@ -69,10 +72,13 @@ public class UserController {
         {
             if (!exist) //抛异常
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误", "failed"));
-            return userService.findByUsernameOrEmail(user.getUsername(),user.getEmail()).hasElements().flatMap(
+            return userService.findByUsernameOrEmail(user.getUsername(), user.getEmail()).hasElements().flatMap(
                     userExist -> {
                         if (userExist)
                             throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或邮箱已被注册", "failed"));
+                        user.setId(null);
+                        user.setRole(Arrays.asList(Role.ROLE_USER));
+                        user.setPassword(passwordEncoder.encode(user.getPassword()));
                         return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", "success")));
                     });
         });
