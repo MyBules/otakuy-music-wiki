@@ -1,0 +1,15 @@
+server:
+  port: 80
+encoder:
+  secret: 生蚝QAQ只是一位兴趣使然的面向ACG编程人员(●'◡'●)ﾉ♥♥♥♥♥♥
+  iteration: 20
+  keylength: 256
+jjwt:
+  secret: 生蚝QAQ只是一位兴趣使然的面向ACG编程人员(●'◡'●)ﾉ♥♥♥♥♥♥
+  expirationTime: 28800
+spring:
+  data:
+    mongodb:
+      database: 123
+      uri: mongodb://192.168.123.149:27017/123
+
