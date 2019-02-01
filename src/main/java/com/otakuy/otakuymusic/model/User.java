@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.otakuy.otakuymusic.model.security.Role;
 import lombok.*;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,26 +11,24 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author ard333
- */
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Document(collection = "user")
 public class User implements UserDetails {
     @Id
     private String id;
-    @NotBlank
+    @javax.validation.constraints.NotBlank
     private String username;
     @NotBlank
     private String password;
     @URL
-    private String imgurl;
+    private String avatar;
     @Email
     private String email;
     private String intro;

@@ -52,11 +52,10 @@ public class WebSecurityConfig {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
-              //  .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                .pathMatchers(HttpMethod.POST,"/users/login").permitAll()
-                .pathMatchers(HttpMethod.GET,"/users/*").permitAll()
-                .pathMatchers(HttpMethod.POST,"/users").permitAll()
-                .pathMatchers(HttpMethod.GET,"/verificationCode/*").permitAll()
+                .pathMatchers(HttpMethod.POST,"/login","/register").permitAll()
+                .pathMatchers(HttpMethod.GET,"/check/emails").permitAll()
+            //    .pathMatchers(HttpMethod.POST,"/users").permitAll()
+             //   .pathMatchers(HttpMethod.GET,"/verificationCode/*").permitAll()
                 .anyExchange().authenticated()
                 .and().build();
 

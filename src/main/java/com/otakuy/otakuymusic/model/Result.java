@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import java.io.Serializable;
-
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Data
 @NoArgsConstructor
@@ -22,6 +20,15 @@ public class Result<T> {
     public Result(String message, T data) {
         this.message = message;
         this.data = data;
+    }
+
+    public Result(String message) {
+        this.message = message;
+    }
+
+    public Result(HttpStatus httpStatus, String message) {
+        this.httpStatus = httpStatus;
+        this.message = message;
     }
 
     public void set(HttpStatus httpStatus, String message, T data) {

@@ -17,10 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 @RestController
-@RequestMapping("/users")
 @Log4j2
 public class UserController {
 
@@ -43,43 +44,48 @@ public class UserController {
             if (passwordEncoder.encode(authRequest.getPassword()).equals(userDetails.getPassword())) {
                 return ResponseEntity.ok(new Result<>("ok", jwtUtil.generateToken(userDetails)));
             }
-            throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或密码错误", "failed"));
+            throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或密码错误"));
         });
     }
 
-    @GetMapping("/usernames")
+    @GetMapping("/check/usernames")
     public Mono<ResponseEntity<Result<String>>> checkByUsername(@RequestParam String username) {
         return userService.findByUsername(username).hasElement().map(exit -> {
             if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该用户名已被注册", "failed"));
-            return ResponseEntity.ok(new Result<>("该用户名可以被注册", "success"));
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该用户名已被注册"));
+            return ResponseEntity.ok(new Result<>("该用户名可以被注册"));
         });
     }
 
-    @GetMapping("/emails")
+    @GetMapping("/check/emails")
     public Mono<ResponseEntity<Result<String>>> checkByEmail(@RequestParam String email) {
         return userService.findByEmail(email).hasElement().map(exit -> {
             if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该邮箱已被注册", "failed"));
-            return ResponseEntity.ok(new Result<>("该邮箱可以被注册", "success"));
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该邮箱已被注册"));
+            return ResponseEntity.ok(new Result<>("该邮箱可以被注册"));
         });
     }
 
-    @PostMapping()
-    public Mono<ResponseEntity<Result<String>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @RequestBody User user) {
+    @PostMapping("/register")
+    public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
         return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement(
         ).flatMap(exist ->
         {
             if (!exist) //抛异常
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误", "failed"));
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误"));
             return userService.findByUsernameOrEmail(user.getUsername(), user.getEmail()).hasElements().flatMap(
                     userExist -> {
                         if (userExist)
-                            throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或邮箱已被注册", "failed"));
+                            throw new CheckException(new Result<>(HttpStatus.CONFLICT , "用户名或邮箱已被注册"));
+                      /*  try {
+                            user.getClass().getMethod("setUsername",String.class).invoke(user,"aas");
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }*/
                         user.setId(null);
                         user.setRole(Arrays.asList(Role.ROLE_USER));
                         user.setPassword(passwordEncoder.encode(user.getPassword()));
-                        return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", "success")));
+                        return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成",user)));
                     });
         });
     }
