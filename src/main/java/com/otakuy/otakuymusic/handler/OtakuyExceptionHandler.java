@@ -18,7 +18,7 @@ public class OtakuyExceptionHandler {
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity handleWebExchangeBindException(WebExchangeBindException webe) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>(webe.getFieldErrors().stream()
-                .map(e -> e.getField()  + e.getDefaultMessage())
+                .map(e -> e.getField() + e.getDefaultMessage())
                 .reduce("", (s1, s2) -> s1 + s2)));
     }
 

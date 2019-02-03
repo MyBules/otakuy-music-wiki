@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 @RestController
@@ -76,16 +75,11 @@ public class UserController {
             return userService.findByUsernameOrEmail(user.getUsername(), user.getEmail()).hasElements().flatMap(
                     userExist -> {
                         if (userExist)
-                            throw new CheckException(new Result<>(HttpStatus.CONFLICT , "用户名或邮箱已被注册"));
-                      /*  try {
-                            user.getClass().getMethod("setUsername",String.class).invoke(user,"aas");
-                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }*/
+                            throw new CheckException(new Result<>(HttpStatus.CONFLICT, "用户名或邮箱已被注册"));
                         user.setId(null);
                         user.setRole(Arrays.asList(Role.ROLE_USER));
                         user.setPassword(passwordEncoder.encode(user.getPassword()));
-                        return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成",user)));
+                        return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
                     });
         });
     }

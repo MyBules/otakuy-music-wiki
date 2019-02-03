@@ -6,5 +6,4 @@ import lombok.Data;
 class Track {
     private String title;
     private String preview;
-
 }

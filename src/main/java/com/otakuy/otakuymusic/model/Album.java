@@ -1,7 +1,6 @@
 package com.otakuy.otakuymusic.model;
 
 import lombok.Data;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,7 +25,7 @@ public class Album {
     private String code;
     private Float rating;
     private Integer rating_count;
-    private String owner_id;
+    private String owner;
     private DownloadRes downloadRes;
 
 }

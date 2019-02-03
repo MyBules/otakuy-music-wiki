@@ -1,7 +1,6 @@
 package com.otakuy.otakuymusic.util;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -12,41 +11,41 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 /**
- *
  * @author ard333
  */
 @Component
-public class PBKDF2Encoder implements PasswordEncoder{
+public class PBKDF2Encoder implements PasswordEncoder {
 
-	@Value("${encoder.secret}")
-	private String secret;
+    @Value("${encoder.secret}")
+    private String secret;
 
-	@Value("${encoder.iteration}")
-	private Integer iteration;
+    @Value("${encoder.iteration}")
+    private Integer iteration;
 
-	@Value("${encoder.keylength}")
-	private Integer keylength;
-	
-	/**
-	 * More info (https://www.owasp.org/index.php/Hashing_Java)
-	 * @param cs password
-	 * @return encoded password
-	 */
-	@Override
-	public String encode(CharSequence cs) {
-		try {
-			byte[] result = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
-											.generateSecret(new PBEKeySpec(cs.toString().toCharArray(), secret.getBytes(), iteration, keylength))
-											.getEncoded();
-			return Base64.getEncoder().encodeToString(result);
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+    @Value("${encoder.keylength}")
+    private Integer keylength;
 
-	@Override
-	public boolean matches(CharSequence cs, String string) {
-		return encode(cs).equals(string);
-	}
-	
+    /**
+     * More info (https://www.owasp.org/index.php/Hashing_Java)
+     *
+     * @param cs password
+     * @return encoded password
+     */
+    @Override
+    public String encode(CharSequence cs) {
+        try {
+            byte[] result = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
+                    .generateSecret(new PBEKeySpec(cs.toString().toCharArray(), secret.getBytes(), iteration, keylength))
+                    .getEncoded();
+            return Base64.getEncoder().encodeToString(result);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public boolean matches(CharSequence cs, String string) {
+        return encode(cs).equals(string);
+    }
+
 }

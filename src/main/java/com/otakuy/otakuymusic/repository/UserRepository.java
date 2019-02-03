@@ -12,7 +12,7 @@ public interface UserRepository extends ReactiveMongoRepository<User, String> {
     Mono<User> findByUsername(String username);
 
     Mono<User> findByEmail(String email);
-    //@Query("{$or: [ { 'username': ?0 }, { 'email': ?1  } ]}")
+
     Flux<User> findByUsernameOrEmail(String username, String email);
 
 }

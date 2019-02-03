@@ -3,7 +3,7 @@ package com.otakuy.otakuymusic.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.otakuy.otakuymusic.model.security.Role;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,7 +16,6 @@ import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Data
 @Document(collection = "user")
