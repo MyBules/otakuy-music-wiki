@@ -5,16 +5,6 @@
 类似音乐以专辑为单位的维基百科,用户创建好基础主题信息经管理员审核通过后就由上传者来维护这个主题(可由其他用户提交修改由维护者审核后可以合并(最短编辑距离,记录路径 合并 回溯),生成贡献者名单,信息包括专辑简介,tag,听后感)
 社区+推荐系统
 ## 社区:
-* github找一些参考(关键词:论坛/ BBS /社交网络/博客)  
-* 后端基于spring+spring-wed
-* 数据验证hibernate-validator
-* 前端layui
-* 权限管理:oauth2 shiro
-* 数据库:Elasticsearch+mariadb
-* workers向外部开放443 端口映射到master的443
-
-
-
 > 框架选择
 * Spring webflux
 * Spring security
