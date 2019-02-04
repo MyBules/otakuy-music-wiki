@@ -34,16 +34,13 @@ import java.util.stream.Collectors;
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
 
-    private final AuthenticationManager authenticationManager;
-    private final SecurityContextRepository securityContextRepository;
-    private final AuthHandler authHandler;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    public WebSecurityConfig(AuthenticationManager authenticationManager, SecurityContextRepository securityContextRepository, AuthHandler authHandler) {
-        this.authenticationManager = authenticationManager;
-        this.securityContextRepository = securityContextRepository;
-        this.authHandler = authHandler;
-    }
+    private SecurityContextRepository securityContextRepository;
+    @Autowired
+    private AuthHandler authHandler;
 
     @Bean
     public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) {
@@ -101,12 +98,8 @@ public class WebSecurityConfig {
     @Component
     class SecurityContextRepository implements ServerSecurityContextRepository {
 
-        private final AuthenticationManager authenticationManager;
-
         @Autowired
-        public SecurityContextRepository(AuthenticationManager authenticationManager) {
-            this.authenticationManager = authenticationManager;
-        }
+        private AuthenticationManager authenticationManager;
 
         @Override
         public Mono<Void> save(ServerWebExchange swe, SecurityContext sc) {
