@@ -16,9 +16,9 @@
 
 
 > 框架选择
-blade
-Dropwizard
-latke 
+* Spring webflux
+* Spring security
+* Mongodb
 	
 
 
