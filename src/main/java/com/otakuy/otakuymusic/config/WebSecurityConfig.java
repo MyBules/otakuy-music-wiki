@@ -36,7 +36,6 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private SecurityContextRepository securityContextRepository;
     @Autowired
