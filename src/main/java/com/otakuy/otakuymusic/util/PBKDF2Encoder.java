@@ -25,12 +25,6 @@ public class PBKDF2Encoder implements PasswordEncoder {
     @Value("${encoder.keylength}")
     private Integer keylength;
 
-    /**
-     * More info (https://www.owasp.org/index.php/Hashing_Java)
-     *
-     * @param cs password
-     * @return encoded password
-     */
     @Override
     public String encode(CharSequence cs) {
         try {
