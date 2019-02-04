@@ -1,12 +1,14 @@
 package com.otakuy.otakuymusic.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 @Data
-class Tag {
+@AllArgsConstructor
+public class Tag {
     @Id
-    private int id;
+    private String id;
     private String name;
 
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Album {
     @Id
     private String id;
+    private String music163Id;
     private String title;
     private ArrayList<Track> tracks;
     private ArrayList<Artist> artists;

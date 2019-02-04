@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.util.WangyiAPI;
 
+import com.otakuy.otakuymusic.model.Track;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -16,10 +17,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class TestApi {
 
@@ -38,9 +39,9 @@ public class TestApi {
         CloseableHttpClient client = HttpClients.custom().build();
         HttpPost httpPost = new HttpPost("https://music.163.com/weapi/cloudsearch/get/web?csrf_token=");
         httpPost.setHeaders(headers);
-        String data = "{\"s\":\"21\",\"type\":\"10\"}";
+        String data = "{\"s\":\"メモセピア\",\"type\":\"10\"}";
         Map<String, String> forms = EncryptUtils.encrypt(data);
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
+        List<NameValuePair> list = new ArrayList<>();
         Iterator iterator = forms.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> elem = (Map.Entry<String, String>) iterator.next();
@@ -54,7 +55,7 @@ public class TestApi {
     }
 
     public static void testCloudSearch() {
-        String data = "{\"s\":\"魔杰座\",\"type\":\"10\"}";
+        String data = "{\"s\":\"金魚花火\",\"type\":\"10\"}";
         Map<String, String> forms = EncryptUtils.encrypt(data);
         String url = "https://music.163.com/weapi/search/suggest/web?csrf_token=";
 
@@ -63,8 +64,8 @@ public class TestApi {
     public static void deal() throws IOException {
 
         CloseableHttpClient client = HttpClients.custom().build();
-        HttpGet httpGet = new HttpGet("https://music.163.com/album?id=64812");
-        httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        HttpGet httpGet = new HttpGet("https://music.163.com/album?id=213252");
+        httpGet.setHeader("Accept", "application/ld+json");
         httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
         httpGet.setHeader("Accept-Language", "zh-CN,zh;q=0.9");
         httpGet.setHeader("Connection", "keep-alive");
@@ -72,13 +73,25 @@ public class TestApi {
         httpGet.setHeader("Referer", "https://music.163.com/");
         httpGet.setHeader("Upgrade-Insecure-Requests", "1");
         httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+
         CloseableHttpResponse response = client.execute(httpGet);
-        Document parse = Jsoup.parse(EntityUtils.toString(response.getEntity()));
-        String tags = parse
+        String html = EntityUtils.toString(response.getEntity());
+        //System.out.println(html);
+        Pattern trackPattern = Pattern.compile("(?<=<a href=\"/song\\?id=).+?(?=</a></li>)");
+        Matcher m = trackPattern.matcher(html);
+        List<Track> collect = m.results().parallel().map(a -> new Track(a.group().split("\">")[1])).collect(Collectors.toList());
+        Pattern introPattern = Pattern.compile("(?<=<a href=\"/song\\?id=).+?(?=</a></li>)");
+        System.out.println(collect);
+/*        while (m.find()) {
+            String[] split = m.group().split("\">");
+            Track track=new Track(split[1],"http://music.163.com/song/media/outer/url?id= "+split[0]+".mp3");
+            System.out.println(track);
+        }*/
+        /*String tags = parse
                 .getElementsByTag("script").eq(0).html();
         String track = parse.getElementById("song-list-pre-data").html();
         System.out.println(tags);
-        System.out.println(track);
+        System.out.println(track);*/
 
     }
 }

@@ -47,23 +47,7 @@ public class UserController {
         });
     }
 
-    @GetMapping("/check/usernames")
-    public Mono<ResponseEntity<Result<String>>> checkByUsername(@RequestParam String username) {
-        return userService.findByUsername(username).hasElement().map(exit -> {
-            if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该用户名已被注册"));
-            return ResponseEntity.ok(new Result<>("该用户名可以被注册"));
-        });
-    }
 
-    @GetMapping("/check/emails")
-    public Mono<ResponseEntity<Result<String>>> checkByEmail(@RequestParam String email) {
-        return userService.findByEmail(email).hasElement().map(exit -> {
-            if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "该邮箱已被注册"));
-            return ResponseEntity.ok(new Result<>("该邮箱可以被注册"));
-        });
-    }
 
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
