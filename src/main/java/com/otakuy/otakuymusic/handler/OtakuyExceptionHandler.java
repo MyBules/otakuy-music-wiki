@@ -1,6 +1,7 @@
 package com.otakuy.otakuymusic.handler;
 
 import com.otakuy.otakuymusic.exception.CheckException;
+import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +22,8 @@ public class OtakuyExceptionHandler {
                 .map(e -> e.getField() + e.getDefaultMessage())
                 .reduce("", (s1, s2) -> s1 + s2)));
     }
-
+    @ExceptionHandler(UnsupportedFormatException.class)
+    public ResponseEntity handleWebExchangeBindException(UnsupportedFormatException ufe) {
+        return ResponseEntity.status(ufe.getResult().getHttpStatus()).body(ufe.getResult());
+    }
 }

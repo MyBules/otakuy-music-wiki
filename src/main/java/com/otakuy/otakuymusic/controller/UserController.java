@@ -1,6 +1,7 @@
 package com.otakuy.otakuymusic.controller;
 
 import com.otakuy.otakuymusic.exception.CheckException;
+import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
@@ -12,12 +13,21 @@ import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.VerificationCodeUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 @RestController
@@ -46,7 +56,28 @@ public class UserController {
             throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或密码错误"));
         });
     }
-
+    @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id,@RequestPart("file") FilePart filePart) throws IOException {
+        String filename = filePart.filename();
+        if (!filename.endsWith(".jpg")&&!filename.endsWith(".png"))
+            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST,"图片格式不支持,上传头像失败"));
+        Path avatar = Paths.get("E:\\123\\"+ user_id+".png");
+        try {
+            if(!Files.exists(avatar)) {
+                avatar = Files.createFile(avatar);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        AsynchronousFileChannel channel =
+                AsynchronousFileChannel.open(avatar, StandardOpenOption.WRITE);
+        DataBufferUtils.write(filePart.content(), channel, 0)
+                .doOnComplete(() -> {
+                    System.out.println("上传完成");
+                })
+                .subscribe();
+        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", avatar.toString())));
+    }
 
 
     @PostMapping("/register")
