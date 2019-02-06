@@ -58,25 +58,7 @@ public class UserController {
     }
     @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id,@RequestPart("file") FilePart filePart) throws IOException {
-        String filename = filePart.filename();
-        if (!filename.endsWith(".jpg")&&!filename.endsWith(".png"))
-            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST,"图片格式不支持,上传头像失败"));
-        Path avatar = Paths.get("E:\\123\\"+ user_id+".png");
-        try {
-            if(!Files.exists(avatar)) {
-                avatar = Files.createFile(avatar);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        AsynchronousFileChannel channel =
-                AsynchronousFileChannel.open(avatar, StandardOpenOption.WRITE);
-        DataBufferUtils.write(filePart.content(), channel, 0)
-                .doOnComplete(() -> {
-                    System.out.println("上传完成");
-                })
-                .subscribe();
-        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", avatar.toString())));
+        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(user_id,filePart))));
     }
 
 
@@ -94,6 +76,7 @@ public class UserController {
                         user.setId(null);
                         user.setRole(Arrays.asList(Role.ROLE_USER));
                         user.setPassword(passwordEncoder.encode(user.getPassword()));
+                        user.setAvatar("https://avatar.otakuy.com/default.png");
                         return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
                     });
         });
