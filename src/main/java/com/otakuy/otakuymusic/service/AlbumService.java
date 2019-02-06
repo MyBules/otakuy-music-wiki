@@ -1,20 +1,30 @@
 package com.otakuy.otakuymusic.service;
 
+import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Album;
+import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -73,5 +83,25 @@ public class AlbumService {
     public Album getAlbumDetailByDouban(String douban_id) throws IOException {
         //  return doubanUtil.getAlbumSuggestion(douban_id);
         return doubanUtil.getAlbumDetail(douban_id);
+    }
+
+    public String uploadCover(String album_id, FilePart filePart) throws IOException {
+        String filename = filePart.filename();
+        if (!filename.endsWith(".jpg") && !filename.endsWith(".png"))
+            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST, "图片格式不支持,上传专辑封面失败"));
+        Path cover = Paths.get("E:\\123\\" + album_id + ".png");
+        if (!Files.exists(cover))
+            cover = Files.createFile(cover);
+        AsynchronousFileChannel channel = AsynchronousFileChannel.open(cover, StandardOpenOption.WRITE);
+        DataBufferUtils.write(filePart.content(), channel, 0)
+                .doOnComplete(() -> {
+                    albumRepository.findById(album_id).flatMap(user -> {
+                        user.setCover("https://avatar.otakuy.com/" + album_id + ".png");
+                        return albumRepository.save(user);
+                    }).subscribe();
+                    System.out.println("更新完成");
+                })
+                .subscribe();
+        return "https://img.otakuy.com/" + album_id + ".png";
     }
 }

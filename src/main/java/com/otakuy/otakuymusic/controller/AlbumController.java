@@ -6,7 +6,9 @@ import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -46,7 +48,10 @@ public class AlbumController {
     public Mono<ResponseEntity<Result<Album>>> test(@RequestBody Revision revision) {
         return albumService.modify(revision).map(album -> ResponseEntity.ok(new Result<>(null, album)));
     }
-
+    @PostMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ResponseEntity<Result<String>>> uploadCover(@PathVariable("album_id") String album_id,@RequestPart("file") FilePart filePart) throws IOException {
+        return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id,filePart))));
+    }
     @GetMapping("/resource/user")
     @PreAuthorize("hasRole('USER')")
     public Mono<ResponseEntity<? extends Result>> user() {

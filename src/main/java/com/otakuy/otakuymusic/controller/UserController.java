@@ -56,9 +56,10 @@ public class UserController {
             throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或密码错误"));
         });
     }
+
     @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id,@RequestPart("file") FilePart filePart) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(user_id,filePart))));
+    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id, @RequestPart("file") FilePart filePart) throws IOException {
+        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(user_id, filePart))));
     }
 
 
