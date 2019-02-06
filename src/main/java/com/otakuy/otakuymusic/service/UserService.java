@@ -61,7 +61,6 @@ public class UserService {
         DataBufferUtils.write(filePart.content(), channel, 0)
                 .doOnComplete(() -> {
                     userRepository.findById(user_id).flatMap(user-> {user.setAvatar("https://avatar.otakuy.com/"+user_id+".png");
-                        System.out.println(user);
                         return userRepository.save(user);}).subscribe();
                     System.out.println("更新完成");
                 })
