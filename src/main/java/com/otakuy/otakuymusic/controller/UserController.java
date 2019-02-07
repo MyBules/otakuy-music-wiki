@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.controller;
 
+import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.exception.CheckException;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
@@ -53,7 +54,9 @@ public class UserController {
 
     //更改头像
     @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id, @RequestPart("file") FilePart filePart) throws IOException {
+    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token,@PathVariable("user_id") String user_id, @RequestPart("file") FilePart filePart) throws IOException {
+        if (!user_id.equals(jwtUtil.getId(token)))
+            throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
         return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(user_id, filePart))));
     }
 

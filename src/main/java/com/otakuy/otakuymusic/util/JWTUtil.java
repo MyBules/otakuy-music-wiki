@@ -13,9 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author ard333
- */
 @Component
 public class JWTUtil implements Serializable {
 
@@ -35,7 +32,7 @@ public class JWTUtil implements Serializable {
         return getAllClaimsFromToken(token).getSubject();
     }
 
-    public Date getExpirationDateFromToken(String token) {
+    private Date getExpirationDateFromToken(String token) {
         return getAllClaimsFromToken(token).getExpiration();
     }
 
@@ -47,10 +44,11 @@ public class JWTUtil implements Serializable {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());
-        return doGenerateToken(claims, user.getUsername());
+        claims.put("star", user.getStar());
+        return doGenerateToken(claims, user);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String username) {
+    private String doGenerateToken(Map<String, Object> claims, User user) {
         Long expirationTimeLong = Long.parseLong(expirationTime); //in second
 
         final Date createdDate = new Date();
@@ -58,7 +56,8 @@ public class JWTUtil implements Serializable {
         return Jwts.builder()
                 .setIssuer("otakuy.com")
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(user.getUsername())
+                .setId(user.getId())
                 .setIssuedAt(createdDate)
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, Base64.getEncoder().encodeToString(secret.getBytes()))
@@ -67,6 +66,14 @@ public class JWTUtil implements Serializable {
 
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
+    }
+
+    public Integer getStar(String token) {
+        return getAllClaimsFromToken(token).get("star", Integer.class);
+    }
+
+    public String getId(String token) {
+        return getAllClaimsFromToken(token).getId();
     }
 
 }

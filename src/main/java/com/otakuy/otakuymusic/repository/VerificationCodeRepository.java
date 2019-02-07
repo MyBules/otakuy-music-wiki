@@ -7,5 +7,5 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface VerificationCodeRepository extends ReactiveMongoRepository<VerificationCodeUtil.VerificationCode, String> {
-    Mono<VerificationCodeUtil.VerificationCode> findByIdAndCode(String id, String code);
+    Mono<VerificationCodeUtil.VerificationCode> findByIdAndCodeIgnoreCase(String id, String code);
 }

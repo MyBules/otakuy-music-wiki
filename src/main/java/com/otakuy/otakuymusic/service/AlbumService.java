@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.service;
 
+import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
@@ -7,6 +8,7 @@ import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
+import com.otakuy.otakuymusic.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -33,12 +35,14 @@ public class AlbumService {
     private final AlbumRepository albumRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final DoubanUtil doubanUtil;
+    private final JWTUtil jwtUtil;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil) {
+    public AlbumService(AlbumRepository albumRepository, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, JWTUtil jwtUtil) {
         this.albumRepository = albumRepository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.doubanUtil = doubanUtil;
+        this.jwtUtil = jwtUtil;
     }
 
     public Flux<Album> findAllByOwner(String owner) {
@@ -84,7 +88,7 @@ public class AlbumService {
         //  return doubanUtil.getAlbumSuggestion(douban_id);
         return doubanUtil.getAlbumDetail(douban_id);
     }
-
+//等待封装成工具类
     public String uploadCover(String album_id, FilePart filePart) throws IOException {
         String filename = filePart.filename();
         if (!filename.endsWith(".jpg") && !filename.endsWith(".png"))
@@ -107,5 +111,22 @@ public class AlbumService {
 
     public Flux<Album> findAllByIsRecommend() {
         return albumRepository.findAllByIsRecommend(true);
+    }
+    public void checkPermission(String token, Album album){
+        Integer star = jwtUtil.getStar(token);
+        if(star-album.getDownloadRes().getPermission()<0)
+            throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+    }
+
+    public Mono<Void> delete(Album album) {
+        return albumRepository.delete(album);
+    }
+
+    public Mono<Album> create(Album album) {
+        return albumRepository.save(album);
+    }
+
+    public Mono<Album> findById(String album_id) {
+        return albumRepository.findById(album_id);
     }
 }

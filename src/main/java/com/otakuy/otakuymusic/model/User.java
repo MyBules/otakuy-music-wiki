@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @Email
     private String email;
     private String intro;
-    private String star;
+    private Integer star;
     private Boolean enabled;
     private List<Role> role;
 

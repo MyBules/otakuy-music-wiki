@@ -1,11 +1,14 @@
 package com.otakuy.otakuymusic.controller;
 
+import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.service.AlbumService;
+import com.otakuy.otakuymusic.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -19,10 +22,34 @@ import java.util.List;
 @RestController
 public class AlbumController {
     private final AlbumService albumService;
+    private final JWTUtil jwtUtil;
 
     @Autowired
-    public AlbumController(AlbumService albumService) {
+    public AlbumController(AlbumService albumService, JWTUtil jwtUtil) {
         this.albumService = albumService;
+        this.jwtUtil = jwtUtil;
+    }
+
+    //增
+    @PostMapping("/albums")
+    public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @RequestBody Album album) {
+        albumService.checkPermission(token, album);
+        album.setOwner(jwtUtil.getId(token));
+        return albumService.create(album).map(newAlbum -> ResponseEntity.ok(new Result<>("创建成功", newAlbum)));
+    }
+
+    //删
+    @DeleteMapping("/albums")
+    public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @RequestBody Album album) {
+        albumService.checkPermission(token, album);
+        return albumService.delete(album).map(a -> ResponseEntity.ok(new Result<>("删除成功")));
+    }
+
+    //改
+    @PutMapping("/albums")
+    public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @RequestBody Album album) {
+        albumService.checkPermission(token, album);
+        return albumService.update(album).map(newAlbum -> ResponseEntity.ok(new Result<>("修改成功", newAlbum)));
     }
 
     //查找指定用户的所有维护专辑
@@ -31,7 +58,7 @@ public class AlbumController {
         return albumService.findAllByOwner(owner).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
-    //获取首页轮播展示专辑
+    //获取首页轮播展示专辑 只返回专辑cover title intro
     @GetMapping("/albums/recommend")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByIsRecommend() {
         return albumService.findAllByIsRecommend().collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
@@ -63,8 +90,19 @@ public class AlbumController {
 
     //上传指定专辑的封面
     @PostMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<Result<String>>> uploadCover(@PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id, filePart))));
+    public Mono<ResponseEntity<Result<String>>> uploadCover(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
+        return albumService.findById(album_id).map(album -> {
+            if (!album.getOwner().equals(jwtUtil.getId(token)))
+                throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+            String url = null;
+            try {
+                url = albumService.uploadCover(album_id, filePart);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.ok(new Result<>("上传专辑封面成功", url));
+        });
+        // return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id, filePart))));
     }
 
     @GetMapping("/resource/user")
