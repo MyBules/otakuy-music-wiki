@@ -104,4 +104,8 @@ public class AlbumService {
                 .subscribe();
         return "https://img.otakuy.com/" + album_id + ".png";
     }
+
+    public Flux<Album> findAllByIsRecommend() {
+        return albumRepository.findAllByIsRecommend(true);
+    }
 }

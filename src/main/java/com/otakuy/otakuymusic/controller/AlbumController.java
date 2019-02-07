@@ -25,33 +25,48 @@ public class AlbumController {
         this.albumService = albumService;
     }
 
+    //查找指定用户的所有维护专辑
     @GetMapping("/uers/{owner}/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwner(@PathVariable("owner") String owner/*, @RequestParam Integer offset, @RequestParam Integer limit*/) {
         return albumService.findAllByOwner(owner).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
-    /*    @GetMapping("/search/tags")
+    //获取首页轮播展示专辑
+    @GetMapping("/albums/recommend")
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByIsRecommend() {
+        return albumService.findAllByIsRecommend().collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+    }
+
+    /* //按照指定tag检索专辑
+    @GetMapping("/search/tags")
         public Mono<ResponseEntity<Result<List<Album>>>> findByTag(@RequestParam String tag*//*,@RequestParam Integer offset, @RequestParam Integer limit*//*) {
         return albumService.findAllByTitle(tag).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }*/
+
+    //依赖豆瓣api根据指定专辑名匹配专辑
     @GetMapping("/douban")
     public Mono<ResponseEntity<Result<List<AlbumSuggestion>>>> getAlbumSuggestionByDouban(@RequestParam String title) {
         return Mono.just(ResponseEntity.ok(new Result<>("ok", albumService.getAlbumSuggestionByDouban(title))));
     }
 
+    //依赖豆瓣api获取专辑详细信息
     @GetMapping("/douban/{douban_id}")
     public Mono<ResponseEntity<Result<Album>>> getAlbumDetailByDouban(@PathVariable("douban_id") String douban_id) throws IOException {
         return Mono.just(ResponseEntity.ok(new Result<>("ok", albumService.getAlbumDetailByDouban(douban_id))));
     }
 
+    //确认修改
     @PostMapping("/test")
     public Mono<ResponseEntity<Result<Album>>> test(@RequestBody Revision revision) {
         return albumService.modify(revision).map(album -> ResponseEntity.ok(new Result<>(null, album)));
     }
+
+    //上传指定专辑的封面
     @PostMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<Result<String>>> uploadCover(@PathVariable("album_id") String album_id,@RequestPart("file") FilePart filePart) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id,filePart))));
+    public Mono<ResponseEntity<Result<String>>> uploadCover(@PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
+        return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id, filePart))));
     }
+
     @GetMapping("/resource/user")
     @PreAuthorize("hasRole('USER')")
     public Mono<ResponseEntity<? extends Result>> user() {

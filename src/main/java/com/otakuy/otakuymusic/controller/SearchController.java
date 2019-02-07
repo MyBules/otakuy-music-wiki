@@ -26,10 +26,14 @@ public class SearchController {
         this.userService = userService;
         this.albumService = albumService;
     }
+
+    //根据指定条件模糊搜索专辑
     @GetMapping("/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> findByFilter(@RequestParam String filter, @RequestParam String param/*,@RequestParam Integer offset, @RequestParam Integer limit*/) {
         return albumService.findAllByFilter(filter, param).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
+
+    //根据指定用户名模糊搜索用户
     @GetMapping("/users")
     public Mono<ResponseEntity<Result<List<User>>>> findByUsername(@RequestParam String username/*,@RequestParam Integer offset, @RequestParam Integer limit*/) {
         //return albumService.findAllByFilter(filter, param).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));

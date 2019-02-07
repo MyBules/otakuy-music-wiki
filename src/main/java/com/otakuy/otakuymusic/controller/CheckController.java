@@ -28,6 +28,7 @@ public class CheckController {
         this.albumService = albumService;
     }
 
+    //检索是否存在重复用户名
     @GetMapping("/usernames")
     public Mono<ResponseEntity<Result<String>>> checkUserByUsername(@RequestParam String username) {
         return userService.findByUsername(username).hasElement().map(exit -> {
@@ -37,6 +38,7 @@ public class CheckController {
         });
     }
 
+    //检索是否存在重复邮箱
     @GetMapping("/emails")
     public Mono<ResponseEntity<Result<String>>> checkUserByEmail(@RequestParam String email) {
         return userService.findByEmail(email).hasElement().map(exit -> {
@@ -46,6 +48,7 @@ public class CheckController {
         });
     }
 
+    //检索是否存在重复专辑名
     @GetMapping("/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> checkAlbumByTitle(@RequestParam String title) {
         return albumService.findAllByFilter("title", title).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));

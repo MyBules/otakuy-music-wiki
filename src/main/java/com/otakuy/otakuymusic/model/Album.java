@@ -29,4 +29,8 @@ public class Album {
     private String owner;
     private DownloadRes downloadRes;
 
+    private String status;
+    private Boolean isRecommend;
+
+
 }

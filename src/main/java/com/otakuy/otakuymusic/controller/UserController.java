@@ -1,7 +1,6 @@
 package com.otakuy.otakuymusic.controller;
 
 import com.otakuy.otakuymusic.exception.CheckException;
-import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
@@ -13,7 +12,6 @@ import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.VerificationCodeUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +21,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 @RestController
@@ -47,6 +40,7 @@ public class UserController {
         this.verificationCodeService = verificationCodeService;
     }
 
+    //用户登录
     @PostMapping("/login")
     public Mono<ResponseEntity<Result<String>>> login(@RequestBody AuthRequest authRequest) {
         return userService.findByUsername(authRequest.getUsername()).map(userDetails -> {
@@ -57,12 +51,13 @@ public class UserController {
         });
     }
 
+    //更改头像
     @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadAvatar(@PathVariable("user_id") String user_id, @RequestPart("file") FilePart filePart) throws IOException {
         return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(user_id, filePart))));
     }
 
-
+    //用户注册
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
         return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement(
