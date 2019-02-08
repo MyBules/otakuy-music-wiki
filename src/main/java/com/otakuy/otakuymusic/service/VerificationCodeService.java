@@ -23,6 +23,6 @@ public class VerificationCodeService {
     }
 
     public Mono<VerificationCodeUtil.VerificationCode> checkVerificationCode(VerificationCodeUtil.VerificationCode verificationCode) {
-        return verificationCodeRepository.findByIdAndCode(verificationCode.getId(), verificationCode.getCode());
+        return verificationCodeRepository.findByIdAndCodeIgnoreCase(verificationCode.getId(), verificationCode.getCode());
     }
 }

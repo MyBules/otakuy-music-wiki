@@ -55,7 +55,7 @@ public class WebSecurityConfig {
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-                .pathMatchers(HttpMethod.GET, "/check/emails","/check/usernames").permitAll()
+                .pathMatchers(HttpMethod.GET, "/check/emails", "/check/usernames").permitAll()
                 .anyExchange().authenticated()
                 .and().build();
 
@@ -120,6 +120,7 @@ public class WebSecurityConfig {
         }
 
     }
+
     @Bean
     CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

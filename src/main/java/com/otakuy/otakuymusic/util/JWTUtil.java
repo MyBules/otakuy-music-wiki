@@ -4,6 +4,7 @@ import com.otakuy.otakuymusic.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class JWTUtil implements Serializable {
     private String expirationTime;
 
     public Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(Base64.getEncoder().encodeToString(secret.getBytes())).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(Keys.hmacShaKeyFor(secret.getBytes())).parseClaimsJws(token).getBody();
     }
 
     public String getUsernameFromToken(String token) {
@@ -45,6 +46,7 @@ public class JWTUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());
         claims.put("star", user.getStar());
+        claims.put("id", user.getId());
         return doGenerateToken(claims, user);
     }
 
@@ -57,10 +59,9 @@ public class JWTUtil implements Serializable {
                 .setIssuer("otakuy.com")
                 .setClaims(claims)
                 .setSubject(user.getUsername())
-                .setId(user.getId())
                 .setIssuedAt(createdDate)
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, Base64.getEncoder().encodeToString(secret.getBytes()))
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
@@ -69,11 +70,11 @@ public class JWTUtil implements Serializable {
     }
 
     public Integer getStar(String token) {
-        return getAllClaimsFromToken(token).get("star", Integer.class);
+        return getAllClaimsFromToken(token.substring(7)).get("star", Integer.class);
     }
 
     public String getId(String token) {
-        return getAllClaimsFromToken(token).getId();
+        return getAllClaimsFromToken(token.substring(7)).get("id",String.class);
     }
 
 }

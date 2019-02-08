@@ -1,7 +1,6 @@
 package com.otakuy.otakuymusic.service;
 
 import com.otakuy.otakuymusic.exception.AuthorityException;
-import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
@@ -9,8 +8,8 @@ import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
+import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,11 +21,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -36,13 +30,15 @@ public class AlbumService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final DoubanUtil doubanUtil;
     private final JWTUtil jwtUtil;
+    private final UploadImageUtil uploadImageUtil;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, JWTUtil jwtUtil) {
+    public AlbumService(AlbumRepository albumRepository, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, JWTUtil jwtUtil, UploadImageUtil uploadImageUtil) {
         this.albumRepository = albumRepository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.doubanUtil = doubanUtil;
         this.jwtUtil = jwtUtil;
+        this.uploadImageUtil = uploadImageUtil;
     }
 
     public Flux<Album> findAllByOwner(String owner) {
@@ -61,7 +57,23 @@ public class AlbumService {
     }
 
     public Mono<Album> update(Album album) {
-        return albumRepository.save(album);
+        return albumRepository.findById(album.getId()).flatMap(oldAlbum -> {
+            oldAlbum.setMusic163Id(album.getMusic163Id());
+            oldAlbum.setTitle(album.getTitle());
+            oldAlbum.setTracks(album.getTracks());
+            oldAlbum.setArtists(album.getArtists());
+            oldAlbum.setPubdate(album.getPubdate());
+            oldAlbum.setPublisher(album.getPublisher());
+            oldAlbum.setGenres(album.getGenres());
+            oldAlbum.setVersion(album.getVersion());
+            oldAlbum.setTags(album.getTags());
+            oldAlbum.setIntro(album.getIntro());
+            oldAlbum.setCover(album.getCover());
+            oldAlbum.setDouban_url(album.getDouban_url());
+            oldAlbum.setCode(album.getCode());
+            oldAlbum.setDownloadRes(album.getDownloadRes());
+            return albumRepository.save(oldAlbum);
+        });
     }
 
     public Mono<Album> add(Album album) {
@@ -88,34 +100,60 @@ public class AlbumService {
         //  return doubanUtil.getAlbumSuggestion(douban_id);
         return doubanUtil.getAlbumDetail(douban_id);
     }
-//等待封装成工具类
+
+    //等待封装成工具类
     public String uploadCover(String album_id, FilePart filePart) throws IOException {
-        String filename = filePart.filename();
-        if (!filename.endsWith(".jpg") && !filename.endsWith(".png"))
-            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST, "图片格式不支持,上传专辑封面失败"));
-        Path cover = Paths.get("E:\\123\\" + album_id + ".png");
-        if (!Files.exists(cover))
-            cover = Files.createFile(cover);
-        AsynchronousFileChannel channel = AsynchronousFileChannel.open(cover, StandardOpenOption.WRITE);
-        DataBufferUtils.write(filePart.content(), channel, 0)
-                .doOnComplete(() -> {
-                    albumRepository.findById(album_id).flatMap(user -> {
-                        user.setCover("https://avatar.otakuy.com/" + album_id + ".png");
-                        return albumRepository.save(user);
-                    }).subscribe();
-                    System.out.println("更新完成");
-                })
-                .subscribe();
+        uploadImageUtil.uploadImage(filePart, "E:\\123\\" + album_id + ".png", () -> {
+            albumRepository.findById(album_id).flatMap(album -> {
+                album.setCover("https://img.otakuy.com/" + album_id + ".png");
+                return albumRepository.save(album);
+            }).subscribe();
+            System.out.println("更新完成");
+        });
         return "https://img.otakuy.com/" + album_id + ".png";
     }
 
     public Flux<Album> findAllByIsRecommend() {
         return albumRepository.findAllByIsRecommend(true);
     }
-    public void checkPermission(String token, Album album){
+
+    public void checkPermission(String token, Album album) {
         Integer star = jwtUtil.getStar(token);
-        if(star-album.getDownloadRes().getPermission()<0)
+        if (star - album.getDownloadRes().getPermission() < 0)
             throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+    }
+
+    public void checkPermission(String token, String album_id) {
+        Integer star = jwtUtil.getStar(token);
+        albumRepository.findById(album_id).subscribe(album -> {
+            if (star - album.getDownloadRes().getPermission() < 0)
+                throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+        });
+    }
+
+    public Boolean checkAuthority(String token, String album_id) {
+        String id = jwtUtil.getId(token);
+        albumRepository.findById(album_id).subscribe(album -> {
+            if (!album.getOwner().equals(jwtUtil.getId(token)))
+                throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+        });
+        return true;
+    }
+
+    public Boolean checkAuthority(String token, Album album) {
+        String id = jwtUtil.getId(token);
+        if (!album.getOwner().equals(jwtUtil.getId(token)))
+            throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+        return true;
+    }
+
+    public Album initNew(String token, Album album) {
+        album.setOwner(jwtUtil.getId(token));
+        album.setRating_count(0);
+        album.setRating(0F);
+        album.setStatus("block");
+        album.setIsRecommend(false);
+        return album;
     }
 
     public Mono<Void> delete(Album album) {

@@ -1,6 +1,5 @@
 package com.otakuy.otakuymusic.controller;
 
-import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
@@ -33,22 +32,23 @@ public class AlbumController {
     //增
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @RequestBody Album album) {
-        albumService.checkPermission(token, album);
-        album.setOwner(jwtUtil.getId(token));
-        return albumService.create(album).map(newAlbum -> ResponseEntity.ok(new Result<>("创建成功", newAlbum)));
+        return albumService.create(albumService.initNew(token,album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("创建成功", newAlbum)));
     }
 
     //删
-    @DeleteMapping("/albums")
-    public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @RequestBody Album album) {
-        albumService.checkPermission(token, album);
-        return albumService.delete(album).map(a -> ResponseEntity.ok(new Result<>("删除成功")));
+    @DeleteMapping("/albums/{album_id}")
+    public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
+        return albumService.findById(album_id).map(album -> {
+            albumService.checkAuthority(token, album);
+            albumService.delete(album).subscribe();
+            return ResponseEntity.status(HttpStatus.OK).body(new Result<String>("删除成功"));
+        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 
     //改
     @PutMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @RequestBody Album album) {
-        albumService.checkPermission(token, album);
+        albumService.checkAuthority(token, album);
         return albumService.update(album).map(newAlbum -> ResponseEntity.ok(new Result<>("修改成功", newAlbum)));
     }
 
@@ -84,7 +84,7 @@ public class AlbumController {
 
     //确认修改
     @PostMapping("/test")
-    public Mono<ResponseEntity<Result<Album>>> test(@RequestBody Revision revision) {
+    public Mono<ResponseEntity<Result<Album>>> test(@RequestHeader("Authorization") String token, @RequestBody Revision revision) {
         return albumService.modify(revision).map(album -> ResponseEntity.ok(new Result<>(null, album)));
     }
 
@@ -92,8 +92,7 @@ public class AlbumController {
     @PostMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadCover(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
         return albumService.findById(album_id).map(album -> {
-            if (!album.getOwner().equals(jwtUtil.getId(token)))
-                throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+            albumService.checkAuthority(token, album);
             String url = null;
             try {
                 url = albumService.uploadCover(album_id, filePart);
@@ -102,7 +101,6 @@ public class AlbumController {
             }
             return ResponseEntity.ok(new Result<>("上传专辑封面成功", url));
         });
-        // return Mono.just(ResponseEntity.ok(new Result<>("上传专辑封面成功", albumService.uploadCover(album_id, filePart))));
     }
 
     @GetMapping("/resource/user")

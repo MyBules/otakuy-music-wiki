@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Track {
     private String title;

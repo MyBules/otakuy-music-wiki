@@ -99,7 +99,7 @@ public class DoubanUtil {
         //标签
         ArrayList<Tag> tagList = new ArrayList<>();
         for (JsonNode tag : rootNode.path("tags")) {
-            tagList.add(new Tag(tag.path("id").asText(), tag.path("name").asText()));
+            tagList.add(new Tag(tag.path("name").asText()));
         }
         album.setTags(tagList);
         //发行者
