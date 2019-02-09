@@ -1,5 +1,6 @@
-# otakuy-music-wiki![](https://img.shields.io/github/stars/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/github/forks/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/badge/license-AGPLv3-blue.svg)
+# otakuy-music-wiki
 ***
+![](https://img.shields.io/github/stars/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/github/forks/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/badge/license-AGPLv3-blue.svg)
 [otakuy-music-wiki](https://otakuy,com)(宅乐(yue)维基)
 以音乐专辑百科信息为文章单位,人人可以参与维护修正的虚拟社区
 ## 简介
