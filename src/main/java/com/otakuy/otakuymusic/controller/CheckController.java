@@ -51,6 +51,10 @@ public class CheckController {
     //检索是否存在重复专辑名
     @GetMapping("/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> checkAlbumByTitle(@RequestParam String title) {
-        return albumService.findAllByFilter("title", title).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+        return albumService.findAllByFilter("title", title).hasElements().map(exit -> {
+            if (exit)
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "重复专辑名"));
+            return ResponseEntity.ok(new Result<>("该邮箱可以被注册"));
+        });
     }
 }
