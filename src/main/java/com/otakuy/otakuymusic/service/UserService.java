@@ -23,22 +23,27 @@ public class UserService {
         this.uploadImageUtil = uploadImageUtil;
     }
 
+    //按照用户名检索
     public Mono<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    //注册
     public Mono<User> userRegister(User user) {
         return userRepository.save(user);
     }
 
+    //按照邮箱检索
     public Mono<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    //按照用户名或邮箱检索
     public Flux<User> findByUsernameOrEmail(String username, String email) {
         return userRepository.findByUsernameOrEmail(username, email);
     }
 
+    //上传(更新)头像
     public String uploadAvatar(String user_id, FilePart filePart) throws IOException {
         uploadImageUtil.uploadImage(filePart, "E:\\123\\" + user_id + ".png", () -> {
             userRepository.findById(user_id).flatMap(user -> {

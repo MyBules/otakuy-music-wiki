@@ -2,10 +2,12 @@ package com.otakuy.otakuymusic.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 
 @Data
+@Document(collection = "revision")
 public class Revision<T> {
     @Id
     private String id;

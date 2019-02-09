@@ -54,8 +54,6 @@ public class UserController {
     //更改头像
     @PostMapping(value = "/users/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token, @RequestPart("file") FilePart filePart) throws IOException {
-    /*    if (!user_id.equals(jwtUtil.getId(token)))
-            throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));*/
         return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
     }
 

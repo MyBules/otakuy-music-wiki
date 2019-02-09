@@ -29,13 +29,13 @@ public class AlbumController {
         this.jwtUtil = jwtUtil;
     }
 
-    //增
+    //增加新的专辑
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @RequestBody Album album) {
         return albumService.create(albumService.initNew(token,album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("创建成功", newAlbum)));
     }
 
-    //删
+    //删(审核不通过专辑也可以删除)
     @DeleteMapping("/albums/{album_id}")
     public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
         return albumService.findById(album_id).map(album -> {
@@ -45,14 +45,14 @@ public class AlbumController {
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 
-    //改
+    //改(审核不通过专辑也可以修改)
     @PutMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @RequestBody Album album) {
         albumService.checkAuthority(token, album);
         return albumService.update(album).map(newAlbum -> ResponseEntity.ok(new Result<>("修改成功", newAlbum)));
     }
 
-    //查找指定用户的所有维护专辑
+    //查找指定用户的所有维护的专辑(包含通过与没通过)
     @GetMapping("/uers/{owner}/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwner(@PathVariable("owner") String owner/*, @RequestParam Integer offset, @RequestParam Integer limit*/) {
         return albumService.findAllByOwner(owner).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));

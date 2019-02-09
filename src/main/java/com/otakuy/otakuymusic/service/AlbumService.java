@@ -45,6 +45,7 @@ public class AlbumService {
         return albumRepository.findAllByOwner(owner);
     }
 
+    //维护者应用协助维护者发起的更改
     public Mono<Album> modify(Revision revision) {
         return albumRepository.findById(revision.getAlbum_id()).flatMap(album -> {
             try {
@@ -56,8 +57,11 @@ public class AlbumService {
         });
     }
 
+    //维护者更新专辑
     public Mono<Album> update(Album album) {
         return albumRepository.findById(album.getId()).flatMap(oldAlbum -> {
+            if (oldAlbum.getStatus().equals("reject"))
+                oldAlbum.setStatus("block");
             oldAlbum.setMusic163Id(album.getMusic163Id());
             oldAlbum.setTitle(album.getTitle());
             oldAlbum.setTracks(album.getTracks());
@@ -76,32 +80,36 @@ public class AlbumService {
         });
     }
 
+    //添加专辑
     public Mono<Album> add(Album album) {
         return albumRepository.save(album);
     }
 
-/*    public Flux<Album> findAllByTitle(String title) {
-        Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
-        Query query = Query.query(Criteria.where("title").regex(pattern));
-        return reactiveMongoTemplate.find(query, Album.class, "album");
-    }*/
+    /*    public Flux<Album> findAllByTitle(String title) {
+            Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
+            Query query = Query.query(Criteria.where("title").regex(pattern));
+            return reactiveMongoTemplate.find(query, Album.class, "album");
+        }*/
 
+    //按照条件筛选
     public Flux<Album> findAllByFilter(String filter, String param) {
         Pattern pattern = Pattern.compile("^.*" + param + ".*$", Pattern.CASE_INSENSITIVE);
         Query query = Query.query(Criteria.where(filter).regex(pattern));
         return reactiveMongoTemplate.find(query, Album.class, "album");
     }
 
+    //获取专辑建议
     public List<AlbumSuggestion> getAlbumSuggestionByDouban(String title) {
         return doubanUtil.getAlbumSuggestion(title);
     }
 
+    //从豆瓣获取专辑详细信息
     public Album getAlbumDetailByDouban(String douban_id) throws IOException {
         //  return doubanUtil.getAlbumSuggestion(douban_id);
         return doubanUtil.getAlbumDetail(douban_id);
     }
 
-    //等待封装成工具类
+    //上传(更新)专辑封面
     public String uploadCover(String album_id, FilePart filePart) throws IOException {
         uploadImageUtil.uploadImage(filePart, "E:\\123\\" + album_id + ".png", () -> {
             albumRepository.findById(album_id).flatMap(album -> {
@@ -113,16 +121,19 @@ public class AlbumService {
         return "https://img.otakuy.com/" + album_id + ".png";
     }
 
+    //获取首页展示专辑
     public Flux<Album> findAllByIsRecommend() {
         return albumRepository.findAllByIsRecommend(true);
     }
 
+    //验证是否有查看下载资源资格
     public void checkPermission(String token, Album album) {
         Integer star = jwtUtil.getStar(token);
         if (star - album.getDownloadRes().getPermission() < 0)
             throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
     }
 
+    //验证是否有查看下载资源资格
     public void checkPermission(String token, String album_id) {
         Integer star = jwtUtil.getStar(token);
         albumRepository.findById(album_id).subscribe(album -> {
@@ -131,6 +142,7 @@ public class AlbumService {
         });
     }
 
+    //验证专辑所有权
     public Boolean checkAuthority(String token, String album_id) {
         String id = jwtUtil.getId(token);
         albumRepository.findById(album_id).subscribe(album -> {
@@ -140,6 +152,7 @@ public class AlbumService {
         return true;
     }
 
+    //验证专辑所有权
     public Boolean checkAuthority(String token, Album album) {
         String id = jwtUtil.getId(token);
         if (!album.getOwner().equals(jwtUtil.getId(token)))
@@ -147,6 +160,7 @@ public class AlbumService {
         return true;
     }
 
+    //新增专辑初始化
     public Album initNew(String token, Album album) {
         album.setOwner(jwtUtil.getId(token));
         album.setRating_count(0);
@@ -156,14 +170,17 @@ public class AlbumService {
         return album;
     }
 
+    //删除专辑
     public Mono<Void> delete(Album album) {
         return albumRepository.delete(album);
     }
 
+    //创建新的专辑
     public Mono<Album> create(Album album) {
         return albumRepository.save(album);
     }
 
+    //按照id查找专辑
     public Mono<Album> findById(String album_id) {
         return albumRepository.findById(album_id);
     }
