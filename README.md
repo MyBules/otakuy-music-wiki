@@ -1,8 +1,7 @@
-# otakuy-music-wiki
+# otakuy-music-wiki![](https://img.shields.io/github/stars/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/github/forks/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/badge/license-AGPLv3-blue.svg)
 ***
 [otakuy-music-wiki](https://otakuy,com)(宅乐(yue)维基)
 以音乐专辑百科信息为文章单位,人人可以参与维护修正的虚拟社区
-![](https://img.shields.io/github/stars/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/github/forks/OysterQAQ/otakuy-music-wiki.svg) ![](https://img.shields.io/license/OysterQAQ/otakuy-music-wiki.svg)
 ## 简介
 类似以专辑信息为文章单位的虚拟社区(论坛),用户创建好基础专辑信息经管理员审核通过后,用户将成为该专辑的维护者,其他用户提交修改由维护者审核后可以合并,将生成贡献者名单.
 整体项目由社区+推荐系统组成
