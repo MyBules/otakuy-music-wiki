@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class Revision<T> {
     @Id
     private String id;
-    private String album_id;
+    private String album;
     private String committer;
-    private String modification_point;
+    private String modificationPoint;
     private T content;
     private String status;
     public final static HashMap MODIFICATION_POINT_MAP;

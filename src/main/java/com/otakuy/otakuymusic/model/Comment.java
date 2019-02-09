@@ -15,11 +15,10 @@ public class Comment {
     private String pid;
     @Id
     private String id;
-
     private String user_id;
     private String user_cover;
     private String user_username;
-
     private String content;
+
     private String createTime;
 }

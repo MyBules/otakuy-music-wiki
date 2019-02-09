@@ -51,19 +51,13 @@ public class UserController {
         });
     }
 
-    //更改头像
-    @PostMapping(value = "/users/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token, @RequestPart("file") FilePart filePart) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
-    }
-
     //用户注册
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
         return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement(
         ).flatMap(exist ->
         {
-            if (!exist) //抛异常
+            if (!exist)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误"));
             return userService.findByUsernameOrEmail(user.getUsername(), user.getEmail()).hasElements().flatMap(
                     userExist -> {
@@ -76,6 +70,12 @@ public class UserController {
                         return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
                     });
         });
+    }
+
+    //更改头像
+    @PostMapping(value = "/users/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token, @RequestPart("file") FilePart filePart) throws IOException {
+        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
     }
 
 }

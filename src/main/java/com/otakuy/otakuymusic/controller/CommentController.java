@@ -27,7 +27,7 @@ public class CommentController {
 
     //提交评论
     @PostMapping("/albums/{album_id}/comments")
-    public Mono<ResponseEntity<Result<Comment>>> save(@RequestBody Comment comment) {
+    public Mono<ResponseEntity<Result<Comment>>> pushComment(@RequestBody Comment comment) {
         return commentService.save(comment).map(c -> ResponseEntity.ok(new Result<>("评论提交成功", c)));
     }
 }
