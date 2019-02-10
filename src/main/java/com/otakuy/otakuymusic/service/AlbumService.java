@@ -9,8 +9,6 @@ import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -18,8 +16,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 public class AlbumService {
@@ -37,7 +35,11 @@ public class AlbumService {
     }
 
     public Flux<Album> findAllByOwner(String owner) {
-        return albumRepository.findAllByOwner(owner).filter(album -> !album.getStatus().equals("reject"));
+        return albumRepository.findAllByOwner(owner);
+    }
+
+    public Flux<Album> findAllByOwnerAndStatusNotReject(String owner) {
+        return albumRepository.findAllByOwnerAndStatusNotReject(owner);
     }
 
     //添加专辑
@@ -51,21 +53,20 @@ public class AlbumService {
             return reactiveMongoTemplate.find(query, Album.class, "album");
         }*/
 
-    //按照条件查找
+/*    //按照条件查找
     public Flux<Album> findAllByFilter(String filter, String param) {
         Pattern pattern = Pattern.compile("^.*" + param + ".*$", Pattern.CASE_INSENSITIVE);
         Query query = Query.query(Criteria.where(filter).regex(pattern));
         return reactiveMongoTemplate.find(query, Album.class, "album").filter(album -> !album.getStatus().equals("reject"));
-    }
+    }*/
 
     //获取专辑建议
-    public List<AlbumSuggestion> getAlbumSuggestionByDouban(String title) {
+    public List<AlbumSuggestion> getAlbumSuggestionByDouban(String title) throws UnsupportedEncodingException {
         return doubanUtil.getAlbumSuggestion(title);
     }
 
     //从豆瓣获取专辑详细信息
     public Album getAlbumDetailByDouban(String douban_id) throws IOException {
-        //  return doubanUtil.getAlbumSuggestion(douban_id);
         return doubanUtil.getAlbumDetail(douban_id);
     }
 
@@ -98,17 +99,27 @@ public class AlbumService {
 
     //创建新的专辑
     public Mono<Album> create(Album album) {
-        return findAllByFilter("title", album.getTitle()).hasElements().flatMap(exit -> {
+        return albumRepository.findByTitle(album.getTitle()).hasElements().flatMap(exit -> {
             if (exit)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "重复专辑名"));
             return albumRepository.save(album);
         });
-
     }
 
     //按照id查找专辑
     public Mono<Album> findById(String album_id) {
-        return albumRepository.findById(album_id).filter(album -> !album.getStatus().equals("reject"));
+        return albumRepository.findById(album_id);
     }
 
+    public Mono<Album> findByIdAndStatusNotReject(String album_id) {
+        return albumRepository.findByIdAndStatusNotReject(album_id);
+    }
+
+    public Flux<Album> findAllByTagAndStatusNotReject(String tag) {
+        return albumRepository.findAllByTagAndStatusNotReject(tag);
+    }
+
+    public Flux<Album> findAllByTitleAndStatusNotReject(String title) {
+        return albumRepository.findAllByTitleAndStatusNotReject(title);
+    }
 }

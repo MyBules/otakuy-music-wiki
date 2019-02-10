@@ -1,9 +1,11 @@
 package com.otakuy.otakuymusic.service;
 
+import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.repository.UserRepository;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -55,4 +57,7 @@ public class UserService {
         return "https://img.otakuy.com/" + user_id + ".png";
     }
 
+    public Mono<User> findById(String user_id) {
+        return userRepository.findById(user_id);
+    }
 }

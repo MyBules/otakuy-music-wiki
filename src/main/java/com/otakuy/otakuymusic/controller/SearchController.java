@@ -27,10 +27,16 @@ public class SearchController {
         this.albumService = albumService;
     }
 
-    //根据指定条件模糊搜索专辑
-    @GetMapping("/albums")
-    public Mono<ResponseEntity<Result<List<Album>>>> findByFilter(@RequestParam String filter, @RequestParam String param/*,@RequestParam Integer offset, @RequestParam Integer limit*/) {
-        return albumService.findAllByFilter(filter, param).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+    //根据指定标题搜索专辑
+    @GetMapping("/byTitle")
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam("title") String title, @RequestParam Integer offset, @RequestParam Integer limit) {
+        return albumService.findAllByTitleAndStatusNotReject(title).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+    }
+
+    //按照指定tag检索专辑
+    @GetMapping("/byTag")
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam("tag") String tag/*,@RequestParam Integer offset, @RequestParam Integer limit*/) {
+        return albumService.findAllByTagAndStatusNotReject(tag).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
     //根据指定用户名模糊搜索用户

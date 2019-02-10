@@ -39,7 +39,7 @@ public class RevisionService {
 
     //检查修改队列
     public Mono<Boolean> checkRevisionQueue(Revision revision) {
-        return revisionRepository.getRevisionQueueCount(revision.getAlbum(), revision.getModificationPoint()).map(count -> {
+        return revisionRepository.countAllByAlbumAndModificationPoint(revision.getAlbum(), revision.getModificationPoint()).map(count -> {
             if (count > 3)
                 throw new RevisionQueueFullException(new Result<>(HttpStatus.BAD_REQUEST, "等待修改队列已满"));
             return true;

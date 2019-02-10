@@ -23,6 +23,7 @@ public class AlbumUtil {
         album.setRating(0F);
         album.setStatus("block");
         album.setIsRecommend(false);
+        album.setCover("https://cover.otakuy.com/default.png");
         return album;
     }
 
@@ -54,12 +55,20 @@ public class AlbumUtil {
             throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
         return true;
     }
+    //验证专辑所有权
+    public Boolean checkAuthorityWithoutThrowException(String token, Album album) {
+        String id = jwtUtil.getId(token);
+        if (!album.getOwner().equals(jwtUtil.getId(token)))
+           return false;
+        return true;
+    }
 
     //验证是否有查看下载资源资格
-    public void checkPermission(String token, Album album) {
+    public Boolean checkPermission(String token, Album album) {
         Integer star = jwtUtil.getStar(token);
         if (star - album.getDownloadRes().getPermission() < 0)
-            throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
+            return false;
+        return true;
     }
 
 }

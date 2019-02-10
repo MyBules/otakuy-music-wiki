@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +41,9 @@ public class DoubanUtil {
         suggestionPattern = Pattern.compile("(?<=(?:\"title\": \"|music\\\\/|\"cover_url\": \")).+?(?=\")");
     }
 
-    public List<AlbumSuggestion> getAlbumSuggestion(String title) {
+    public List<AlbumSuggestion> getAlbumSuggestion(String title) throws UnsupportedEncodingException {
         String result = Objects.requireNonNull(webclient.get()
-                .uri(URI.create("https://frodo.douban.com/api/v2/search/music?count=15&q=" + title + "&start=0&version=6.9.1&sort=T"))
+                .uri(URI.create("https://frodo.douban.com/api/v2/search/music?count=15&q=" + URLEncoder.encode(title, "UTF-8") + "&start=0&version=6.9.1&sort=T"))
                 .exchange().block())
                 .bodyToMono(String.class).block();
         assert result != null;
@@ -91,11 +93,11 @@ public class DoubanUtil {
         //介绍
         album.setIntro(rootNode.path("intro").asText());
         //流派
-        album.setGenres(rootNode.path("genres").toString());
+        album.setGenres(rootNode.path("genres").toString().toString().replace("\"]","").replace("[\"",""));
         //标题
         album.setTitle(rootNode.path("title").asText());
         //类型
-        album.setVersion(rootNode.path("version").toString());
+        album.setVersion(rootNode.path("version").toString().toString().replace("\"]","").replace("[\"",""));
         //标签
         ArrayList<Tag> tagList = new ArrayList<>();
         for (JsonNode tag : rootNode.path("tags")) {
@@ -103,7 +105,7 @@ public class DoubanUtil {
         }
         album.setTags(tagList);
         //发行者
-        album.setPublisher(rootNode.path("publisher").toString());
+        album.setPublisher(rootNode.path("publisher").toString().replace("\"]","").replace("[\"",""));
         //艺术家
         ArrayList<Artist> artistList = new ArrayList<>();
         for (JsonNode tag : rootNode.path("singer")) {

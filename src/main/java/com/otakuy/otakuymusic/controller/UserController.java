@@ -64,9 +64,11 @@ public class UserController {
                         if (userExist)
                             throw new CheckException(new Result<>(HttpStatus.CONFLICT, "用户名或邮箱已被注册"));
                         user.setId(null);
+                        user.setEnabled(true);
                         user.setRole(Arrays.asList(Role.ROLE_USER));
                         user.setPassword(passwordEncoder.encode(user.getPassword()));
                         user.setAvatar("https://avatar.otakuy.com/default.png");
+                        user.setStar(0);
                         return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
                     });
         });
@@ -77,5 +79,12 @@ public class UserController {
     public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token, @RequestPart("file") FilePart filePart) throws IOException {
         return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
     }
+
+    //按照id查看用户信息
+    @GetMapping("/users/{user_id}")
+    public Mono<ResponseEntity<Result<User>>> findById(@PathVariable("user_id") String user_id) {
+        return userService.findById(user_id).map(user -> ResponseEntity.ok(new Result<>("注册完成", user))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
+    }
+    //修改用户信息
 
 }
