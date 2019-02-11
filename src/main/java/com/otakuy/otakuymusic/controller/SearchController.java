@@ -6,6 +6,10 @@ import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +31,16 @@ public class SearchController {
         this.albumService = albumService;
     }
 
-    //根据指定标题搜索专辑
+    //根据指定标题模糊搜索专辑
     @GetMapping("/byTitle")
-    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam("title") String title, @RequestParam Integer offset, @RequestParam Integer limit) {
-        return albumService.findAllByTitleAndStatusNotReject(title).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam("title") String title, @RequestParam("page") Integer page) {
+        return albumService.findAllByTitleAndStatusActive(title,PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
     //按照指定tag检索专辑
     @GetMapping("/byTag")
-    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam("tag") String tag/*,@RequestParam Integer offset, @RequestParam Integer limit*/) {
-        return albumService.findAllByTagAndStatusNotReject(tag).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam("tag") String tag,@RequestParam("page") Integer page) {
+        return albumService.findAllByTagAndStatusActive(tag,PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
     //根据指定用户名模糊搜索用户

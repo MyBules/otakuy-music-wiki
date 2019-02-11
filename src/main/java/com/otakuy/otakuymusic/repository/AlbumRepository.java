@@ -1,7 +1,7 @@
 package com.otakuy.otakuymusic.repository;
 
 import com.otakuy.otakuymusic.model.Album;
-import org.springframework.data.mongodb.repository.DeleteQuery;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -10,24 +10,27 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface AlbumRepository extends ReactiveMongoRepository<Album, String> {
-    Flux<Album> findAllByOwner(String owner);
+    Flux<Album> findAllByOwner(String owner, Pageable pageable);
 
     @Query("{'owner': ?0 ,'status': { '$ne' : \"reject\"}}")
-    Flux<Album> findAllByOwnerAndStatusNotReject(String owner);
+    Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable);
 
-    Flux<Album> findAllByTitle(String title);
+    @Query("{'owner': ?0 ,'status': \"active\"}")
+    Flux<Album> findAllByOwnerAndStatusActive(String owner, Pageable pageable);
+
+    Flux<Album> findAllByTitle(String title, Pageable pageable);
 
     @Query("{'title': ?0 ,'status': { '$ne' : \"reject\"}}")
     Flux<Album> findAllByTitleAndStatusNotReject(String title);
 
-    Flux<Album> findAllByIsRecommend(Boolean isRecommend);
+    @Query("{'title': {$regex:?0,$options:'i'} ,'status': \"active\"}")
+    Flux<Album> findAllByTitleAndStatusActive(String title, Pageable pageable);
 
-    @Query("{'tags.name': ?0 ,'status': { '$ne' : \"reject\"}}")
-    Flux<Album> findAllByTagAndStatusNotReject(String tag);
+    @Query("{'tags.name': ?0 ,'status': \"active\"}")
+    Flux<Album> findAllByTagAndStatusActive(String tag, Pageable pageable);
 
     @Query("{'_id': ?0 ,'status': { '$ne' : \"reject\"}}")
     Mono<Album> findByIdAndStatusNotReject(String id);
 
-    @Query("{'title': ?0 ,'status': { '$ne' : \"reject\"}}")
-    Flux<Album> findByTitle(String title);
+    Flux<Album> findAllByIsRecommend(Boolean isRecommend);
 }

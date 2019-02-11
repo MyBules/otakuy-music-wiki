@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -49,7 +50,7 @@ public class UserController {
 
     //用户登录
     @PostMapping("/login")
-    public Mono<ResponseEntity<Result<String>>> login(@RequestBody AuthRequest authRequest) {
+    public Mono<ResponseEntity<Result<String>>> login(@Validated @RequestBody AuthRequest authRequest) {
         return userService.findByUsername(authRequest.getUsername()).map(userDetails -> {
             if (passwordEncoder.encode(authRequest.getPassword()).equals(userDetails.getPassword())) {
                 return ResponseEntity.ok(new Result<>("ok", jwtUtil.generateToken(userDetails)));
@@ -124,7 +125,7 @@ public class UserController {
     }
 
     //修改用户信息
-    public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @RequestBody User user) {
+    public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @Validated @RequestBody User user) {
         return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
                 userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
         ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));

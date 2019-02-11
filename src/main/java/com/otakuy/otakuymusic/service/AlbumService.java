@@ -8,6 +8,7 @@ import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
@@ -34,12 +35,12 @@ public class AlbumService {
         this.uploadImageUtil = uploadImageUtil;
     }
 
-    public Flux<Album> findAllByOwner(String owner) {
-        return albumRepository.findAllByOwner(owner);
+    public Flux<Album> findAllByOwner(String owner, Pageable pageable) {
+        return albumRepository.findAllByOwner(owner,pageable);
     }
 
-    public Flux<Album> findAllByOwnerAndStatusNotReject(String owner) {
-        return albumRepository.findAllByOwnerAndStatusNotReject(owner);
+    public Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable) {
+        return albumRepository.findAllByOwnerAndStatusNotReject(owner, pageable);
     }
 
     //添加专辑
@@ -99,7 +100,7 @@ public class AlbumService {
 
     //创建新的专辑
     public Mono<Album> create(Album album) {
-        return albumRepository.findByTitle(album.getTitle()).hasElements().flatMap(exit -> {
+        return albumRepository.findAllByTitleAndStatusNotReject(album.getTitle()).hasElements().flatMap(exit -> {
             if (exit)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "重复专辑名"));
             return albumRepository.save(album);
@@ -115,8 +116,12 @@ public class AlbumService {
         return albumRepository.findByIdAndStatusNotReject(album_id);
     }
 
-    public Flux<Album> findAllByTagAndStatusNotReject(String tag) {
-        return albumRepository.findAllByTagAndStatusNotReject(tag);
+    public Flux<Album> findAllByTagAndStatusActive(String tag, Pageable pageable) {
+        return albumRepository.findAllByTagAndStatusActive(tag, pageable);
+    }
+
+    public Flux<Album> findAllByTitleAndStatusActive(String title, Pageable pageable) {
+        return albumRepository.findAllByTitleAndStatusActive(title, pageable);
     }
 
     public Flux<Album> findAllByTitleAndStatusNotReject(String title) {

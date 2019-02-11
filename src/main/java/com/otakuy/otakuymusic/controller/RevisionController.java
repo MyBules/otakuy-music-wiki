@@ -10,6 +10,7 @@ import com.otakuy.otakuymusic.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +32,7 @@ public class RevisionController {
     }
 
     @PostMapping("/albums/{album_id}/revisions")
-    public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token, @RequestBody Revision revision) {
+    public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token,@Validated @RequestBody Revision revision) {
         revision.setCommitter(jwtUtil.getId(token));
         revisionService.save(revision);
         return Mono.just(ResponseEntity.ok().body(new Result<>("提交修改成功,等待维护者审核")));
@@ -43,7 +44,7 @@ public class RevisionController {
     }
 
     @PostMapping("/albums/{album_id}/revisions/{revision_id}")
-    public Mono<ResponseEntity<Result<Album>>> commit(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @PathVariable("revision_id") String revision_id, @RequestBody Revision revision) {
+    public Mono<ResponseEntity<Result<Album>>> commit(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @PathVariable("revision_id") String revision_id,@Validated @RequestBody Revision revision) {
         return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
             return revisionService.commitRevision(revision).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)));

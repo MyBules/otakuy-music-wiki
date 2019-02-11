@@ -1,11 +1,12 @@
 package com.otakuy.otakuymusic.repository;
 
 import com.otakuy.otakuymusic.model.Comment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
 public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
-    Flux<Comment> findAllByAlbum(String album_id);
+    Flux<Comment> findAllByAlbum(String album_id, Pageable pageable);
 }

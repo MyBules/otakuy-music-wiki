@@ -8,10 +8,13 @@ import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +38,7 @@ public class AlbumController {
 
     //增加新的专辑
     @PostMapping("/albums")
-    public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @RequestBody Album album) {
+    public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
         return albumService.create(albumUtil.initNew(token, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("创建成功", newAlbum)));
     }
 
@@ -51,7 +54,7 @@ public class AlbumController {
 
     //修改专辑(审核不通过专辑也可以修改)
     @PutMapping("/albums")
-    public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @RequestBody Album album) {
+    public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
         return albumService.findById(album.getId()).map(oldAlbum -> {
             albumUtil.checkAuthority(token, oldAlbum);
             Album newAlbum = albumUtil.update(oldAlbum, album);
@@ -88,8 +91,8 @@ public class AlbumController {
 
     //查找指定用户的所有维护的专辑(包含通过与没通过)
     @GetMapping("/uers/{owner}/albums")
-    public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwner(@PathVariable("owner") String owner/*, @RequestParam Integer offset, @RequestParam Integer limit*/) {
-        return albumService.findAllByOwner(owner).collectList().map(albums -> {
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwner(@PathVariable("owner") String owner, @RequestParam Integer page) {
+        return albumService.findAllByOwner(owner, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> {
             albums.forEach(album -> album.setDownloadRes(null));
             return ResponseEntity.ok(new Result<>("共有" + albums.size() + "张维护专辑", albums));
         }).defaultIfEmpty(ResponseEntity.ok(new Result<>("该用户不存在或者没有专辑", null)));

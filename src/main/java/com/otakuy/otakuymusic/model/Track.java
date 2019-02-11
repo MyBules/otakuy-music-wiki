@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Track {
+    @NotBlank
     private String title;
     private String preview;
 

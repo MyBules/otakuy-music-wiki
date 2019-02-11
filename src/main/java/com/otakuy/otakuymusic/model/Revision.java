@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 
 @Data
@@ -11,9 +12,13 @@ import java.util.HashMap;
 public class Revision<T> {
     @Id
     private String id;
+    @NotBlank
     private String album;
+    @NotBlank
     private String committer;
+    @NotBlank
     private String modificationPoint;
+    @NotBlank
     private T content;
     private String status;
     public final static HashMap MODIFICATION_POINT_MAP;

@@ -1,10 +1,9 @@
 package com.otakuy.otakuymusic.service;
 
 import com.otakuy.otakuymusic.model.Comment;
-import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,8 +17,8 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public Flux<Comment> findAllByAlbum_id(String album_id) {
-        return commentRepository.findAllByAlbum(album_id);
+    public Flux<Comment> findAllByAlbum_id(String album_id, Pageable pageable) {
+        return commentRepository.findAllByAlbum(album_id, pageable);
     }
 
     public Mono<Comment> save(Comment comment) {
