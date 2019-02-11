@@ -55,7 +55,8 @@ public class WebSecurityConfig {
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-                .pathMatchers(HttpMethod.GET, "/check/emails", "/check/usernames","/verificationCode","/albums/recommendAlbum").permitAll()
+                .pathMatchers(HttpMethod.PUT, "/users/password").permitAll()
+                .pathMatchers(HttpMethod.GET, "/check/emails", "/check/usernames", "/verificationCode", "/albums/recommendAlbum", "/forgetPassword", "/test").permitAll()
                 .anyExchange().authenticated()
                 .and().build();
 

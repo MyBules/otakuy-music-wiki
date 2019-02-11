@@ -6,6 +6,7 @@ import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
+@Log4j2
 public class AlbumController {
     private final AlbumService albumService;
     private final AlbumUtil albumUtil;

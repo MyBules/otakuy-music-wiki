@@ -44,11 +44,25 @@ public class VerificationCodeUtil {
         @Transient
         private String imageBase64;
         private Date createtime;
+        private String content;
 
         public VerificationCode(String id, String code) {
             this.id = id;
             this.code = code;
         }
+
+        public VerificationCode(String id, String code, String content) {
+            this.id = id;
+            this.code = code;
+            this.content = content;
+        }
+    }
+
+    public VerificationCode creatVerificationCode(String email) {
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setCode(randomStr(CODE_COUNT));
+        verificationCode.setContent(email);
+        return verificationCode;
     }
 
     public VerificationCode creatVerificationCode() {

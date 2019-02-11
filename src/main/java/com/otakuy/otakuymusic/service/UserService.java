@@ -1,11 +1,10 @@
 package com.otakuy.otakuymusic.service;
 
-import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.repository.UserRepository;
+import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,11 +17,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UploadImageUtil uploadImageUtil;
+    private final PBKDF2Encoder pbkdf2Encoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UploadImageUtil uploadImageUtil) {
+    public UserService(UserRepository userRepository, UploadImageUtil uploadImageUtil, PBKDF2Encoder pbkdf2Encoder) {
         this.userRepository = userRepository;
         this.uploadImageUtil = uploadImageUtil;
+        this.pbkdf2Encoder = pbkdf2Encoder;
     }
 
     //按照用户名检索
@@ -59,5 +60,18 @@ public class UserService {
 
     public Mono<User> findById(String user_id) {
         return userRepository.findById(user_id);
+    }
+
+    public Mono<User> updatePersonalInformation(User user) {
+        return userRepository.save(user);
+    }
+
+    //修改密码
+    public Mono<User> modifyPassword(String email, String password) {
+        return findByEmail(email).flatMap(user -> {
+            user.setPassword(pbkdf2Encoder.encode(password));
+            System.out.println(user.getPassword());
+            return userRepository.save(user);
+        });
     }
 }

@@ -5,10 +5,12 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
 import com.otakuy.otakuymusic.model.security.Role;
+import com.otakuy.otakuymusic.service.EmailService;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.service.VerificationCodeService;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import com.otakuy.otakuymusic.util.PBKDF2Encoder;
+import com.otakuy.otakuymusic.util.UserUtil;
 import com.otakuy.otakuymusic.util.VerificationCodeUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,15 +31,19 @@ import java.util.Arrays;
 public class UserController {
 
     private final JWTUtil jwtUtil;
+    private final UserUtil userUtil;
     private final PBKDF2Encoder passwordEncoder;
     private final UserService userService;
+    private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
 
     @Autowired
-    public UserController(JWTUtil jwtUtil, PBKDF2Encoder passwordEncoder, UserService userService, VerificationCodeService verificationCodeService) {
+    public UserController(JWTUtil jwtUtil, UserUtil userUtil, PBKDF2Encoder passwordEncoder, UserService userService, EmailService emailService, VerificationCodeService verificationCodeService) {
         this.jwtUtil = jwtUtil;
+        this.userUtil = userUtil;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.emailService = emailService;
         this.verificationCodeService = verificationCodeService;
     }
 
@@ -54,8 +61,7 @@ public class UserController {
     //用户注册
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
-        return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement(
-        ).flatMap(exist ->
+        return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement().flatMap(exist ->
         {
             if (!exist)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误"));
@@ -80,11 +86,47 @@ public class UserController {
         return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
     }
 
+    //申请重置密码
+    @GetMapping(value = "/forgetPassword")
+    public Mono<ResponseEntity<Result<String>>> requestModifyPassword(@RequestParam("email") String email) throws IOException {
+        return userService.findByEmail(email).hasElement().flatMap(exit -> {
+            if (!exit)
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "邮箱不存在"));
+            return verificationCodeService.getPasswordVerificationCode(email).flatMap(verificationCode -> {
+                try {
+                    return emailService.sendVerificationEmail(email, verificationCode).map(result -> ResponseEntity.ok(new Result<>("发送验证邮件成功")));
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("发送验证邮件失败")));
+            });
+        });
+    }
+
+    //更改密码
+    @PutMapping(value = "/users/password")
+    public Mono<ResponseEntity<Result<String>>> modifyPassword(@RequestParam("email") String email, @RequestParam("verificationCode") String verificationCode, @RequestParam("verificationCodeId") String verificationCodeId, @RequestParam String password) throws IOException {
+        return verificationCodeService.checkPasswordVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode, email)).hasElement().flatMap(exist -> {
+            if (!exist)
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "链接错误或失效", "重置密码失败"));
+            return userService.modifyPassword(email, password).hasElement().map(userExist -> {
+                if (!userExist)
+                    throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "邮箱不存在"));
+                return ResponseEntity.ok(new Result<>("修改密码成功"));
+            });
+        });
+    }
+
     //按照id查看用户信息
     @GetMapping("/users/{user_id}")
     public Mono<ResponseEntity<Result<User>>> findById(@PathVariable("user_id") String user_id) {
         return userService.findById(user_id).map(user -> ResponseEntity.ok(new Result<>("注册完成", user))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
     }
-    //修改用户信息
 
+    //修改用户信息
+    public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @RequestBody User user) {
+        return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
+                userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
+        ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
+    }
 }

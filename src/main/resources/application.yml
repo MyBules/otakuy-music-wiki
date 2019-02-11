@@ -12,5 +12,21 @@ spring:
     mongodb:
       database: 123
       uri: mongodb://192.168.123.150:27017/123
+  mail:
+    host: smtp.qq.com
+    username: 403827354@qq.com
+    password: mgysdtrrgxzsbhie
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 douban:
   authorization: Bearer 3b436c09829cb2e6b1ca441c87d618b2
+mail:
+  content:
+
+
