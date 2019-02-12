@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TestApi {
-
+/*
     private static final String userId = "32689809";
 
     private static Header[] headers = new Header[4];
@@ -82,16 +82,16 @@ public class TestApi {
         List<Track> collect = m.results().parallel().map(a -> new Track(a.group().split("\">")[1])).collect(Collectors.toList());
         Pattern introPattern = Pattern.compile("(?<=<a href=\"/song\\?id=).+?(?=</a></li>)");
         System.out.println(collect);
-/*        while (m.find()) {
+*//*        while (m.find()) {
             String[] split = m.group().split("\">");
             Track track=new Track(split[1],"http://music.163.com/song/media/outer/url?id= "+split[0]+".mp3");
             System.out.println(track);
-        }*/
-        /*String tags = parse
+        }*//*
+        *//*String tags = parse
                 .getElementsByTag("script").eq(0).html();
         String track = parse.getElementById("song-list-pre-data").html();
         System.out.println(tags);
-        System.out.println(track);*/
+        System.out.println(track);*//*
 
-    }
+    }*/
 }

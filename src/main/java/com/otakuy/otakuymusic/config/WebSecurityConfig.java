@@ -30,19 +30,28 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author ard333
- */
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
     private SecurityContextRepository securityContextRepository;
+    private final AuthHandler authHandler;
+
     @Autowired
-    private AuthHandler authHandler;
+    public WebSecurityConfig(AuthHandler authHandler) {
+        this.authHandler = authHandler;
+    }
+
+    @Autowired
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Autowired
+    public void setSecurityContextRepository(SecurityContextRepository securityContextRepository) {
+        this.securityContextRepository = securityContextRepository;
+    }
 
     @Bean
     public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) {
@@ -99,8 +108,13 @@ public class WebSecurityConfig {
     @Component
     class SecurityContextRepository implements ServerSecurityContextRepository {
 
+        private final AuthenticationManager authenticationManager;
+
         @Autowired
-        private AuthenticationManager authenticationManager;
+        public SecurityContextRepository(AuthenticationManager authenticationManager) {
+            super();
+            this.authenticationManager = authenticationManager;
+        }
 
         @Override
         public Mono<Void> save(ServerWebExchange swe, SecurityContext sc) {
