@@ -14,11 +14,9 @@ public class Revision<T> {
     private String id;
     @NotBlank
     private String album;
-    @NotBlank
     private String committer;
     @NotBlank
     private String modificationPoint;
-    @NotBlank
     private T content;
     private String status;
     public final static HashMap MODIFICATION_POINT_MAP;

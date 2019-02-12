@@ -36,7 +36,7 @@ public class AlbumService {
     }
 
     public Flux<Album> findAllByOwner(String owner, Pageable pageable) {
-        return albumRepository.findAllByOwner(owner,pageable);
+        return albumRepository.findAllByOwner(owner, pageable);
     }
 
     public Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable) {
@@ -110,6 +110,11 @@ public class AlbumService {
     //按照id查找专辑
     public Mono<Album> findById(String album_id) {
         return albumRepository.findById(album_id);
+    }
+
+    //按照id查找专辑且状态为审核通过
+    public Mono<Boolean> existByIdAndStatusActive(String album_id) {
+        return albumRepository.existByIdAndStatusActive(album_id);
     }
 
     public Mono<Album> findByIdAndStatusNotReject(String album_id) {

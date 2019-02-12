@@ -10,8 +10,12 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface RevisionRepository extends ReactiveMongoRepository<Revision, String> {
-   @CountQuery(value = "{'album':  ?0, 'modificationPoint': ?1,'status': 'block'}")
-    Mono<Integer> countAllByAlbumAndModificationPoint(String album_id, String modification_point);
-    @CountQuery(value = "{'album':  ?0, 'status': 'block'}")
+    @CountQuery("{'album':  ?0, 'modificationPoint': ?1 , 'status': \"block\"}")
+    Mono<Long> countAllByAlbumAndModificationPoint(String album_id, String modification_point);
+
+    @CountQuery("{'album':  ?0, 'status': \"block\"}")
     Flux<Revision> findAllByAlbum(String album_id);
+
+    @Query("{'_id': ?0 , 'status' : \"block\"}")
+    Mono<Revision> findByIdAndStatusBlock(String revision_id);
 }

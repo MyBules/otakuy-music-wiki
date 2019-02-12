@@ -16,15 +16,12 @@ public class Album {
     private String music163Id;
     @NotBlank
     private String title;
-    @NotBlank
     private ArrayList<Track> tracks;
-    @NotBlank
     private ArrayList<Artist> artists;
     private String pubdate;
     private String publisher;
     private String genres;
     private String version;
-    @NotBlank
     private ArrayList<Tag> tags;
     @NotBlank
     private String intro;

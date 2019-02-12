@@ -1,27 +1,5 @@
 package com.otakuy.otakuymusic.util.WangyiAPI;
 
-import com.otakuy.otakuymusic.model.Track;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 public class TestApi {
 /*
     private static final String userId = "32689809";
@@ -87,7 +65,7 @@ public class TestApi {
             Track track=new Track(split[1],"http://music.163.com/song/media/outer/url?id= "+split[0]+".mp3");
             System.out.println(track);
         }*//*
-        *//*String tags = parse
+     *//*String tags = parse
                 .getElementsByTag("script").eq(0).html();
         String track = parse.getElementById("song-list-pre-data").html();
         System.out.println(tags);
