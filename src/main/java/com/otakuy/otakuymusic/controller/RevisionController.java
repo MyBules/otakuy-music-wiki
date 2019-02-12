@@ -34,13 +34,11 @@ public class RevisionController {
     //提交修改
     @PostMapping("/albums/{album_id}/revisions")
     public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Revision revision) {
-        System.out.println(revision);
         return albumService.existByIdAndStatusActive(revision.getAlbum()).flatMap(exist -> {
             if (!exist)
                 return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<String>("专辑不存在或未审核通过")));
             revision.setCommitter(jwtUtil.getId(token));
             revision.setStatus("block");
-            System.out.println(revision);
             return revisionService.save(revision).map(then -> ResponseEntity.ok().body(new Result<String>("提交修改成功,等待维护者审核")));
         });
 
