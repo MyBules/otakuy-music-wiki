@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,17 +22,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-@RestController
 @Log4j2
+@RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlbumController {
     private final AlbumService albumService;
     private final AlbumUtil albumUtil;
-
-    @Autowired
-    public AlbumController(AlbumService albumService, AlbumUtil albumUtil) {
-        this.albumService = albumService;
-        this.albumUtil = albumUtil;
-    }
 
     //增加新的专辑
     @PostMapping("/albums")
@@ -79,11 +75,11 @@ public class AlbumController {
     @GetMapping("/albums/{album_id}")
     public Mono<ResponseEntity<Result<Album>>> findById(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
         return albumService.findById(album_id).flatMap(album -> {
-            return albumService.checkPermission(token, album).map(result -> {
-                if (!result)
-                    album.setDownloadRes(null);
-                return ResponseEntity.status(HttpStatus.OK).body(new Result<>("success", album));
-            });
+                    return albumService.checkPermission(token, album).map(result -> {
+                        if (!result)
+                            album.setDownloadRes(null);
+                        return ResponseEntity.status(HttpStatus.OK).body(new Result<>("success", album));
+                    });
                    /* if (!(albumService.checkPermission(token, album) || albumUtil.checkAuthorityWithoutThrowException(token, album)))
                         album.setDownloadRes(null);
                     return ResponseEntity.status(HttpStatus.OK).body(new Result<>("success", album));*/

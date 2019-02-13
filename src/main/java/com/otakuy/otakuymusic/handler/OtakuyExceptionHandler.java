@@ -1,9 +1,6 @@
 package com.otakuy.otakuymusic.handler;
 
-import com.otakuy.otakuymusic.exception.AuthorityException;
-import com.otakuy.otakuymusic.exception.CheckException;
-import com.otakuy.otakuymusic.exception.RevisionQueueFullException;
-import com.otakuy.otakuymusic.exception.UnsupportedFormatException;
+import com.otakuy.otakuymusic.exception.*;
 import com.otakuy.otakuymusic.model.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +31,14 @@ public class OtakuyExceptionHandler {
     public ResponseEntity handleAuthorityException(AuthorityException ae) {
         return ResponseEntity.status(ae.getResult().getHttpStatus()).body(ae.getResult());
     }
+
     @ExceptionHandler(RevisionQueueFullException.class)
     public ResponseEntity handleRevisionQueueFullException(RevisionQueueFullException rqfe) {
         return ResponseEntity.status(rqfe.getResult().getHttpStatus()).body(rqfe.getResult());
+    }
+
+    @ExceptionHandler(StarException.class)
+    public ResponseEntity handleStarException(StarException se) {
+        return ResponseEntity.status(se.getResult().getHttpStatus()).body(se.getResult());
     }
 }

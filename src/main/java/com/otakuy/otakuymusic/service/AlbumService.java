@@ -9,6 +9,7 @@ import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -23,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlbumService {
     private final AlbumRepository albumRepository;
     private final UserService userService;
@@ -31,17 +33,6 @@ public class AlbumService {
     private final UploadImageUtil uploadImageUtil;
     private final JWTUtil jwtUtil;
     private final AlbumUtil albumUtil;
-
-    @Autowired
-    public AlbumService(AlbumRepository albumRepository, UserService userService, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, UploadImageUtil uploadImageUtil, JWTUtil jwtUtil, AlbumUtil albumUtil) {
-        this.albumRepository = albumRepository;
-        this.userService = userService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.doubanUtil = doubanUtil;
-        this.uploadImageUtil = uploadImageUtil;
-        this.jwtUtil = jwtUtil;
-        this.albumUtil = albumUtil;
-    }
 
     public Flux<Album> findAllByOwner(String owner, Pageable pageable) {
         return albumRepository.findAllByOwner(owner, pageable);

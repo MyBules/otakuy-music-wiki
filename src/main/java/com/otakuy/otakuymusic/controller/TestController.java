@@ -2,6 +2,7 @@ package com.otakuy.otakuymusic.controller;
 
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.util.EmailUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,11 @@ import java.util.Date;
 
 @RestController
 @Log4j2
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TestController {
     private final EmailUtil emailUtil;
 
-    @Autowired
-    public TestController(EmailUtil emailUtil) {
-        this.emailUtil = emailUtil;
-    }
+
 /*
     @GetMapping("/test")
     public Mono<ResponseEntity<Result<String>>> sendEmailTest(@RequestParam("emial") String email) throws MessagingException {

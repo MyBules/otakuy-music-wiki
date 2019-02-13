@@ -4,6 +4,7 @@ import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.repository.UserRepository;
 import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,12 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserService {
 
     private final UserRepository userRepository;
     private final UploadImageUtil uploadImageUtil;
     private final PBKDF2Encoder pbkdf2Encoder;
-
-    @Autowired
-    public UserService(UserRepository userRepository, UploadImageUtil uploadImageUtil, PBKDF2Encoder pbkdf2Encoder) {
-        this.userRepository = userRepository;
-        this.uploadImageUtil = uploadImageUtil;
-        this.pbkdf2Encoder = pbkdf2Encoder;
-    }
 
     //按照用户名检索
     public Mono<User> findByUsername(String username) {

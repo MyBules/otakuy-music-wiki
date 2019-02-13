@@ -39,4 +39,5 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
 
     @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);
+
 }

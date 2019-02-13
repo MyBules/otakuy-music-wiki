@@ -6,6 +6,7 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.repository.RevisionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,10 @@ import reactor.core.publisher.Mono;
 import java.lang.reflect.InvocationTargetException;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RevisionService {
     private final AlbumRepository albumRepository;
     private final RevisionRepository revisionRepository;
-
-    @Autowired
-    public RevisionService(AlbumRepository albumRepository, RevisionRepository revisionRepository) {
-        this.albumRepository = albumRepository;
-        this.revisionRepository = revisionRepository;
-    }
 
     //维护者应用协助者发起的更改
     public Mono<Album> commitRevision(Revision revision) {
@@ -47,10 +43,10 @@ public class RevisionService {
     }
 
     //保存修改请求到数据库
-    public Mono save(Revision revision) {
-        return checkRevisionQueue(revision).map(result -> {
+    public Mono<Revision> save(Revision revision) {
+        return checkRevisionQueue(revision).flatMap(result -> {
             if (result)
-                return revisionRepository.save(revision).subscribe();
+                return (Mono<Revision>) revisionRepository.save(revision);
             throw new RevisionQueueFullException(new Result<>(HttpStatus.BAD_REQUEST, "等待修改队列已满"));
         });
     }

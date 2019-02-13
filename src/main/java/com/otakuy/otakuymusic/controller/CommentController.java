@@ -3,6 +3,7 @@ package com.otakuy.otakuymusic.controller;
 import com.otakuy.otakuymusic.model.Comment;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,13 +15,9 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CommentController {
     private final CommentService commentService;
-
-    @Autowired
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
 
     //拉取专辑下所有评论
     @GetMapping("/albums/{album_id}/comments")

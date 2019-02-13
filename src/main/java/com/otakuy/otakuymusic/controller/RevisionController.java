@@ -7,6 +7,7 @@ import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.RevisionService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,19 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RevisionController {
     private final JWTUtil jwtUtil;
     private final AlbumUtil albumUtil;
     private final RevisionService revisionService;
     private final AlbumService albumService;
 
-    @Autowired
-    public RevisionController(JWTUtil jwtUtil, AlbumUtil albumUtil, RevisionService revisionService, AlbumService albumService) {
-        this.jwtUtil = jwtUtil;
-        this.albumUtil = albumUtil;
-        this.revisionService = revisionService;
-        this.albumService = albumService;
-    }
-
     //提交修改
     @PostMapping("/albums/{album_id}/revisions")
     public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Revision revision) {
         return albumService.existByIdAndStatusActive(revision.getAlbum()).flatMap(exist -> {
             if (!exist)
-                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<String>("专辑不存在或未审核通过")));
+                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在或未审核通过")));
             revision.setCommitter(jwtUtil.getId(token));
             revision.setStatus("block");
             return revisionService.save(revision).map(then -> ResponseEntity.ok().body(new Result<String>("提交修改成功,等待维护者审核")));

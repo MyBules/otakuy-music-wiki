@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CheckException extends RuntimeException {
+public class StarException extends RuntimeException {
     private Result result;
 }

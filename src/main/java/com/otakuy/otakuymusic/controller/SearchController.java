@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,15 +22,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/search")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SearchController {
     private final UserService userService;
     private final AlbumService albumService;
-
-    @Autowired
-    public SearchController(UserService userService, AlbumService albumService) {
-        this.userService = userService;
-        this.albumService = albumService;
-    }
 
     //根据指定标题模糊搜索专辑
     @GetMapping("/byTitle")

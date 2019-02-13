@@ -3,18 +3,15 @@ package com.otakuy.otakuymusic.util;
 import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlbumUtil {
     private final JWTUtil jwtUtil;
-
-    @Autowired
-    public AlbumUtil(JWTUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
 
     //新增专辑初始化
     public Album initNew(String token, Album album) {

@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/check")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CheckController {
     private final UserService userService;
     private final AlbumService albumService;
-
-    @Autowired
-    public CheckController(UserService userService, AlbumService albumService) {
-        this.userService = userService;
-        this.albumService = albumService;
-    }
 
     //检索是否存在重复用户名
     @GetMapping("/usernames")

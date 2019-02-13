@@ -12,6 +12,7 @@ import com.otakuy.otakuymusic.util.JWTUtil;
 import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.UserUtil;
 import com.otakuy.otakuymusic.util.VerificationCodeUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,8 +28,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Arrays;
 
-@RestController
 @Log4j2
+@RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserController {
 
     private final JWTUtil jwtUtil;
@@ -37,16 +39,6 @@ public class UserController {
     private final UserService userService;
     private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
-
-    @Autowired
-    public UserController(JWTUtil jwtUtil, UserUtil userUtil, PBKDF2Encoder passwordEncoder, UserService userService, EmailService emailService, VerificationCodeService verificationCodeService) {
-        this.jwtUtil = jwtUtil;
-        this.userUtil = userUtil;
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-        this.emailService = emailService;
-        this.verificationCodeService = verificationCodeService;
-    }
 
     //用户登录
     @PostMapping("/login")
