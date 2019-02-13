@@ -28,10 +28,11 @@ public class StarService {
     @Transactional
     public Mono<Star> create(Star star) {
         return reactiveMongoTemplate.updateFirst(new Query(where("_id").is(star.getStarFrom())),
-                new Update().inc("star", -star.getNum()), User.class).then(reactiveMongoTemplate.updateFirst(new Query(where("_id").is(star.getStarFrom())),
+                new Update().inc("star", -star.getNum()), User.class).then(reactiveMongoTemplate.updateFirst(new Query(where("_id").is(star.getStarTo())),
                 new Update().inc("star", star.getNum()), User.class)).map(UpdateResult::wasAcknowledged).flatMap(result -> {
-            if (result)
+            if (result) {
                 return starRepository.save(star);
+            }
             throw new StarException(new Result(HttpStatus.BAD_REQUEST, "打赏逻辑遇到未知异常,请重新提交"));
         });
     }

@@ -24,16 +24,20 @@ public class StarController {
     private final JWTUtil jwtUtil;
 
     //打赏
-    @PostMapping("/album/{album_id}/star")
+    @PostMapping("/albums/{album_id}/star")
     public Mono<ResponseEntity<Result<Star>>> create(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestBody Star star) {
-        return userService.findStarById(jwtUtil.getId(token)).flatMap(sum -> {
-            if (sum >= star.getNum())
+        return userService.findStarById(star.getStarTo()).flatMap(sum -> {
+            star.setStarFrom(jwtUtil.getId(token));
+            star.setStarAt(album_id);
+            if (sum >= star.getNum() && !star.getStarTo().equals(star.getStarFrom())) {
                 return starService.create(star).map(save -> ResponseEntity.ok(new Result<>("打赏成功", save)));
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("拥有star数不足")));
-        });
+            }
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<Star>("拥有star数不足or自己给自己打赏是不行的哦")));
+        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("被打赏用户不存在")));
     }
+
     //按专辑获取打赏列表
-    @GetMapping("/album/{album_id}/star")
+    @GetMapping("/albums/{album_id}/star")
     public Mono<ResponseEntity<Result<List<Star>>>> get(@PathVariable("album_id") String album_id) {
         return albumService.existByIdAndStatusActive(album_id).flatMap(exist -> {
             if (exist)
