@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.RevisionService;
+import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class RevisionController {
     private final AlbumUtil albumUtil;
     private final RevisionService revisionService;
     private final AlbumService albumService;
+    private final UserService userService;
 
     //提交修改
     @PostMapping("/albums/{album_id}/revisions")
@@ -49,7 +51,10 @@ public class RevisionController {
     public Mono<ResponseEntity<Result<Album>>> commit(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @PathVariable("revision_id") String revision_id) {
         return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
-            return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> revisionService.commitRevision(revision).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
+            return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> {
+                userService.updateStarById(revision.getCommitter(), 10).subscribe();//加分
+                return revisionService.commitRevision(revision).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)));
+            }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 }
