@@ -45,7 +45,7 @@ public class JWTUtil implements Serializable {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());
-        claims.put("star", user.getStar());
+        //claims.put("star", user.getStar());
         claims.put("id", user.getId());
         return doGenerateToken(claims, user);
     }
@@ -69,9 +69,9 @@ public class JWTUtil implements Serializable {
         return !isTokenExpired(token);
     }
 
-    public Integer getStar(String token) {
+   /* public Integer getStar(String token) {
         return getAllClaimsFromToken(token.substring(7)).get("star", Integer.class);
-    }
+    }*/
 
     public String getId(String token) {
         return getAllClaimsFromToken(token.substring(7)).get("id",String.class);

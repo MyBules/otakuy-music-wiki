@@ -2,10 +2,12 @@ package com.otakuy.otakuymusic.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 
 @Data
+@Document(collection = "notification")
 public class Notification<T> {
     @Id
     private String id;
@@ -20,10 +22,10 @@ public class Notification<T> {
         ACTIONMAP = new HashMap<String, String>() {{
             put("albumBeCommented", "您维护的专辑收到一条评论");
             put("albumBeStarred", "您维护的专辑收到打赏");
-            put("albumBeActive", "您提交的专辑通过审核");
+            put("albumBeRequestedRevision", "您维护的专辑收到一条修改请求");
 
+            put("albumBeActive", "您提交的专辑通过审核");
             put("albumBeReject", "您提交的专辑未通过审核");
-            put("reviseQuest", "您维护的专辑收到一条修改请求");
 
             put("revisionBeActive", "您提交的修改被采用");
             put("revisionBeReject", "您提交的修改被拒绝");

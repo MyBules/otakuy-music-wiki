@@ -74,4 +74,9 @@ public class UserService {
             return userRepository.save(user);
         });
     }
+
+    //查询star数
+    public Mono<Integer> findStarById(String id) {
+        return userRepository.findStarById(id).map(User::getStar);
+    }
 }

@@ -63,12 +63,4 @@ public class AlbumUtil {
         return true;
     }
 
-    //验证是否有查看下载资源资格
-    public Boolean checkPermission(String token, Album album) {
-        Integer star = jwtUtil.getStar(token);
-        if (star - album.getDownloadRes().getPermission() < 0)
-            return false;
-        return true;
-    }
-
 }

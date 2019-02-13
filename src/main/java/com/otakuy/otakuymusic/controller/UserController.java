@@ -130,4 +130,5 @@ public class UserController {
                 userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
         ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
     }
+
 }

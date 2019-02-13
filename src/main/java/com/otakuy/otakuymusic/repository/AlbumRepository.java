@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface AlbumRepository extends ReactiveMongoRepository<Album, String> {
+    @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByOwner(String owner, Pageable pageable);
 
     @Query("{'owner': ?0 ,'status': { '$ne' : \"reject\"}}")
@@ -24,10 +25,10 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query("{'title': ?0 ,'status': { '$ne' : \"reject\"}}")
     Flux<Album> findAllByTitleAndStatusNotReject(String title);
 
-    @Query("{'title': {$regex:?0 ,$options:'i'} ,'status': \"active\"}")
+    @Query(value = "{'title': {$regex:?0 ,$options:'i'} ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByTitleAndStatusActive(String title, Pageable pageable);
 
-    @Query("{'tags.name': ?0 ,'status': \"active\"}")
+    @Query(value = "{'tags.name': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByTagAndStatusActive(String tag, Pageable pageable);
 
     @Query("{'_id': ?0 ,'status': { '$ne' : \"reject\"}}")
@@ -36,5 +37,6 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @ExistsQuery("{'_id': ?0 , 'status' :\"active\" }")
     Mono<Boolean> existByIdAndStatusActive(String id);
 
+    @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);
 }

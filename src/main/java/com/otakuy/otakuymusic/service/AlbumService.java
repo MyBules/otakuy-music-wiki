@@ -5,7 +5,9 @@ import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
+import com.otakuy.otakuymusic.util.AlbumUtil;
 import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
+import com.otakuy.otakuymusic.util.JWTUtil;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -23,16 +25,22 @@ import java.util.List;
 @Service
 public class AlbumService {
     private final AlbumRepository albumRepository;
+    private final UserService userService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final DoubanUtil doubanUtil;
     private final UploadImageUtil uploadImageUtil;
+    private final JWTUtil jwtUtil;
+    private final AlbumUtil albumUtil;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, UploadImageUtil uploadImageUtil) {
+    public AlbumService(AlbumRepository albumRepository, UserService userService, ReactiveMongoTemplate reactiveMongoTemplate, DoubanUtil doubanUtil, UploadImageUtil uploadImageUtil, JWTUtil jwtUtil, AlbumUtil albumUtil) {
         this.albumRepository = albumRepository;
+        this.userService = userService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.doubanUtil = doubanUtil;
         this.uploadImageUtil = uploadImageUtil;
+        this.jwtUtil = jwtUtil;
+        this.albumUtil = albumUtil;
     }
 
     public Flux<Album> findAllByOwner(String owner, Pageable pageable) {
@@ -131,5 +139,10 @@ public class AlbumService {
 
     public Flux<Album> findAllByTitleAndStatusNotReject(String title) {
         return albumRepository.findAllByTitleAndStatusNotReject(title);
+    }
+
+    //验证是否有查看下载资源资格
+    public Mono<Boolean> checkPermission(String token, Album album) {
+        return userService.findStarById(jwtUtil.getId(token)).map(star -> star - album.getDownloadRes().getPermission() >= 0 || albumUtil.checkAuthorityWithoutThrowException(token, album));
     }
 }

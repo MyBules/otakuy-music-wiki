@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.Id;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 
 @Data
 @Document(collection = "album")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Album {
     @Id
     private String id;
