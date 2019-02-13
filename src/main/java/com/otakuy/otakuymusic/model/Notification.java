@@ -1,20 +1,24 @@
 package com.otakuy.otakuymusic.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.HashMap;
 
 @Data
 @Document(collection = "notification")
-public class Notification<T> {
+@AllArgsConstructor
+public class Notification {
     @Id
     private String id;
+    private String owner;
     private String albumId;
     private Boolean isRead;
-    private String creatTime;
-    private T content;
+    private Date creatTime;
+    private String content;
     private String url;
     public final static HashMap ACTIONMAP;
 

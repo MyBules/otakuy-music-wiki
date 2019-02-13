@@ -4,6 +4,7 @@ import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Revision;
 import com.otakuy.otakuymusic.service.AlbumService;
+import com.otakuy.otakuymusic.service.NotificationService;
 import com.otakuy.otakuymusic.service.RevisionService;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
@@ -25,6 +26,7 @@ public class RevisionController {
     private final AlbumUtil albumUtil;
     private final RevisionService revisionService;
     private final AlbumService albumService;
+    private final NotificationService notificationService;
     private final UserService userService;
 
     //提交修改
@@ -35,7 +37,7 @@ public class RevisionController {
                 return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在或未审核通过")));
             revision.setCommitter(jwtUtil.getId(token));
             revision.setStatus("block");
-            return revisionService.save(revision).map(then -> ResponseEntity.ok().body(new Result<String>("提交修改成功,等待维护者审核")));
+            return revisionService.save(revision).map(then -> ResponseEntity.ok().body(new Result<>("提交修改成功,等待维护者审核")));
         });
 
     }

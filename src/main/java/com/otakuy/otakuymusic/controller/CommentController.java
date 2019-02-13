@@ -1,8 +1,10 @@
 package com.otakuy.otakuymusic.controller;
 
 import com.otakuy.otakuymusic.model.Comment;
+import com.otakuy.otakuymusic.model.Notification;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.service.CommentService;
+import com.otakuy.otakuymusic.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,12 +14,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CommentController {
     private final CommentService commentService;
+    private final NotificationService notificationService;
 
     //拉取专辑下所有评论
     @GetMapping("/albums/{album_id}/comments")
@@ -28,6 +32,6 @@ public class CommentController {
     //提交评论
     @PostMapping("/albums/{album_id}/comments")
     public Mono<ResponseEntity<Result<Comment>>> pushComment(@Validated @RequestBody Comment comment) {
-        return commentService.save(comment).map(c -> ResponseEntity.ok(new Result<>("评论提交成功", c)));
+        return commentService.save(comment).flatMap(c -> notificationService.save(new Notification(null, comment.getPid(), comment.getAlbum(), false, new Date(), (String) Notification.ACTIONMAP.get("albumBeCommented"), "url")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
     }
 }

@@ -16,7 +16,7 @@ public class Comment {
     @NotBlank
     private String album;
     @NotBlank
-    private String pid;
+    private String pid;//最上级pid为用户id
     @Id
     private String id;
     @NotBlank
