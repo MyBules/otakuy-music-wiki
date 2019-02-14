@@ -1,6 +1,5 @@
 package com.otakuy.otakuymusic.config;
 
-import com.otakuy.otakuymusic.handler.AuthHandler;
 import com.otakuy.otakuymusic.model.security.Role;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import io.jsonwebtoken.Claims;
@@ -36,12 +35,6 @@ public class WebSecurityConfig {
 
     private AuthenticationManager authenticationManager;
     private SecurityContextRepository securityContextRepository;
-    private final AuthHandler authHandler;
-
-    @Autowired
-    public WebSecurityConfig(AuthHandler authHandler) {
-        this.authHandler = authHandler;
-    }
 
     @Autowired
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
@@ -59,7 +52,6 @@ public class WebSecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .logout().disable()
-                .exceptionHandling().accessDeniedHandler(authHandler).and()
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
@@ -68,7 +60,6 @@ public class WebSecurityConfig {
                 .pathMatchers(HttpMethod.GET, "/check/emails", "/check/usernames", "/verificationCode", "/albums/recommendAlbum", "/forgetPassword", "/test").permitAll()
                 .anyExchange().authenticated()
                 .and().build();
-
     }
 
     @Component

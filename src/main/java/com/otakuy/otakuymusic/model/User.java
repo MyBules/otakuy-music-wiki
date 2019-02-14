@@ -26,9 +26,9 @@ public class User implements UserDetails {
     private String username;
     @NotBlank(message = "密码不能为空")
     private String password;
-    @URL
+    @URL(message = "非有效URL")
     private String avatar;
-    @Email
+    @Email(message = "非有效邮箱地址")
     private String email;
     private String intro;
     private Integer star;

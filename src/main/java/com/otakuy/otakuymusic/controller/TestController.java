@@ -26,7 +26,7 @@ public class TestController {
 
 /*
     @GetMapping("/test")
-    public Mono<ResponseEntity<Result<String>>> sendEmailTest(@RequestParam("emial") String email) throws MessagingException {
+    public Mono<ResponseEntity<Result<String>>> sendEmailTest(@RequestParam String email) throws MessagingException {
         log.info("start");
         Mono<MimeMessage> stringMono = emailUtil.sendVerificationEmail(email,"");
         log.info("over");

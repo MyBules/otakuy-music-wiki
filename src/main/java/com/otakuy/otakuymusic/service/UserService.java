@@ -89,7 +89,7 @@ public class UserService {
                 new Update().inc("star", star), User.class);
     }
 
-    public Flux<User> findAllByEnable(Boolean isEnable, Pageable pageable) {
-        return userRepository.findAllByEnable(isEnable, pageable);
+    public Flux<User> findAllByEnabled(Boolean isEnable, Pageable pageable) {
+        return userRepository.findAllByEnabled(isEnable, pageable);
     }
 }

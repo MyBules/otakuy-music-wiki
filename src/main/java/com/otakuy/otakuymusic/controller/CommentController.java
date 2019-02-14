@@ -24,7 +24,7 @@ public class CommentController {
 
     //拉取专辑下所有评论
     @GetMapping("/albums/{album_id}/comments")
-    public Mono<ResponseEntity<Result<List<Comment>>>> pullAllCommentByAlbum_id(@PathVariable("album_id") String album_id, @RequestParam("page") Integer page) {
+    public Mono<ResponseEntity<Result<List<Comment>>>> pullAllCommentByAlbum_id(@PathVariable("album_id") String album_id, @RequestParam Integer page) {
         return commentService.findAllByAlbum_id(album_id, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(comments -> ResponseEntity.ok(new Result<>("该专辑共有" + comments.size() + "条评论", comments)));
     }
 

@@ -29,13 +29,13 @@ public class SearchController {
 
     //根据指定标题模糊搜索专辑
     @GetMapping("/byTitle")
-    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam("title") String title, @RequestParam("page") Integer page) {
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam String title, @RequestParam Integer page) {
         return albumService.findAllByTitleAndStatusActive(title,PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 
     //按照指定tag检索专辑
     @GetMapping("/byTag")
-    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam("tag") String tag,@RequestParam("page") Integer page) {
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam String tag, @RequestParam Integer page) {
         return albumService.findAllByTagAndStatusActive(tag,PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "", albums)));
     }
 

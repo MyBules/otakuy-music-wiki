@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
+import javax.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class OtakuyExceptionHandler {
     @ExceptionHandler(CheckException.class)
@@ -41,4 +43,32 @@ public class OtakuyExceptionHandler {
     public ResponseEntity handleStarException(StarException se) {
         return ResponseEntity.status(se.getResult().getHttpStatus()).body(se.getResult());
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity handleConstraintViolationException(ConstraintViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("请求参数错误"));
+
+    }
+
+/*    @ExceptionHandler(Exception.class)//可以用来找异常类
+    public ResponseEntity handleException(Exception ae) {
+        System.out.println(ae);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("登录异常"));
+        // return null;
+    }*/
+/*
+    @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
+    public ResponseEntity handleBindException(MethodArgumentNotValidException ex) {
+       */
+/* FieldError fieldError = ex.getBindingResult().getFieldError();
+        log.info("参数校验异常:{}({})", fieldError.getDefaultMessage(),fieldError.getField());
+        Map<String,Object> result = new HashMap<String,Object>();
+        result.put("respCode", "01002");
+        result.put("respMsg", fieldError.getDefaultMessage());
+        return result;*//*
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("登录异常"));
+
+    }
+*/
 }

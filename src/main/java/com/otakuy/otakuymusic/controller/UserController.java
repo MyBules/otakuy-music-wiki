@@ -81,7 +81,7 @@ public class UserController {
 
     //申请重置密码
     @GetMapping(value = "/forgetPassword")
-    public Mono<ResponseEntity<Result<String>>> requestModifyPassword(@RequestParam("email") String email) throws IOException {
+    public Mono<ResponseEntity<Result<String>>> requestModifyPassword(@RequestParam String email) throws IOException {
         return userService.findByEmail(email).hasElement().flatMap(exit -> {
             if (!exit)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "邮箱不存在"));
@@ -98,7 +98,7 @@ public class UserController {
 
     //更改密码
     @PutMapping(value = "/users/password")
-    public Mono<ResponseEntity<Result<String>>> modifyPassword(@RequestParam("email") String email, @RequestParam("verificationCode") String verificationCode, @RequestParam("verificationCodeId") String verificationCodeId, @RequestParam String password) throws IOException {
+    public Mono<ResponseEntity<Result<String>>> modifyPassword(@RequestParam String email, @RequestParam String verificationCode, @RequestParam String verificationCodeId, @RequestParam String password) throws IOException {
         return verificationCodeService.checkPasswordVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode, email)).hasElement().flatMap(exist -> {
             if (!exist)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "链接错误或失效", "重置密码失败"));

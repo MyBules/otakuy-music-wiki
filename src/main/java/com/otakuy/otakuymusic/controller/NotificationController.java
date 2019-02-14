@@ -30,7 +30,7 @@ public class NotificationController {
 
     //获取消息列表
     @GetMapping("/notifications")
-    public Mono<ResponseEntity<Result<List<Notification>>>> getUnreadList(@RequestHeader("Authorization") String token, @RequestParam("isRead") Boolean isRead) {
+    public Mono<ResponseEntity<Result<List<Notification>>>> getUnreadList(@RequestHeader("Authorization") String token, @RequestParam Boolean isRead) {
         return notificationService.findAllByIsReadAndOwner(isRead, jwtUtil.getId(token)).collectList().map(list -> {
             if (!isRead)
                 reactiveMongoTemplate.updateFirst(new Query(where("_id").in(list.stream().parallel().map(Notification::getId).collect(Collectors.toList()))),
