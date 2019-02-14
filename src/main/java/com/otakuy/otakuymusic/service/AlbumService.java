@@ -132,6 +132,10 @@ public class AlbumService {
         return albumRepository.findAllByTitleAndStatusNotReject(title);
     }
 
+    public Flux<Album> findAllByStatus(String status, Pageable pageable) {
+        return albumRepository.findAllByStatus(status, pageable);
+    }
+
     //验证是否有查看下载资源资格
     public Mono<Boolean> checkPermission(String token, Album album) {
         return userService.findStarById(jwtUtil.getId(token)).map(star -> star - album.getDownloadRes().getPermission() >= 0 || albumUtil.checkAuthorityWithoutThrowException(token, album));

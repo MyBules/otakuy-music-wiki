@@ -7,6 +7,7 @@ import com.otakuy.otakuymusic.util.PBKDF2Encoder;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -86,5 +87,9 @@ public class UserService {
     public Mono<UpdateResult> updateStarById(String id, Integer star) {
         return reactiveMongoTemplate.updateFirst(new Query(where("_id").is(id)),
                 new Update().inc("star", star), User.class);
+    }
+
+    public Flux<User> findAllByEnable(Boolean isEnable, Pageable pageable) {
+        return userRepository.findAllByEnable(isEnable, pageable);
     }
 }

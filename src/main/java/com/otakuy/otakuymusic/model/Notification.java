@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 @Data
-@Document(collection = "notification")
 @NoArgsConstructor
+@Document(collection = "notification")
 public class Notification {
     @Id
     private String id;

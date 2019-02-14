@@ -1,8 +1,10 @@
 package com.otakuy.otakuymusic.controller;
 
+import com.otakuy.otakuymusic.model.Notification;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.Star;
 import com.otakuy.otakuymusic.service.AlbumService;
+import com.otakuy.otakuymusic.service.NotificationService;
 import com.otakuy.otakuymusic.service.StarService;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.util.JWTUtil;
@@ -21,6 +23,7 @@ public class StarController {
     private final StarService starService;
     private final AlbumService albumService;
     private final UserService userService;
+    private final NotificationService notificationService;
     private final JWTUtil jwtUtil;
 
     //打赏
@@ -30,7 +33,7 @@ public class StarController {
             star.setStarFrom(jwtUtil.getId(token));
             star.setStarAt(album_id);
             if (sum >= star.getNum() && !star.getStarTo().equals(star.getStarFrom())) {
-                return starService.create(star).map(save -> ResponseEntity.ok(new Result<>("打赏成功", save)));
+                return starService.create(star).then(notificationService.save(new Notification(star.getStarTo(), star.getStarAt(), "albumBeStarred", "url"))).map(then -> ResponseEntity.ok(new Result<Star>("打赏成功")));
             }
             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<Star>("拥有star数不足or自己给自己打赏是不行的哦")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("被打赏用户不存在")));
