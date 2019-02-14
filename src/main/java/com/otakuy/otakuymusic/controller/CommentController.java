@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -32,6 +31,6 @@ public class CommentController {
     //提交评论
     @PostMapping("/albums/{album_id}/comments")
     public Mono<ResponseEntity<Result<Comment>>> pushComment(@Validated @RequestBody Comment comment) {
-        return commentService.save(comment).flatMap(c -> notificationService.save(new Notification(null, comment.getPid(), comment.getAlbum(), false, new Date(), (String) Notification.ACTIONMAP.get("albumBeCommented"), "url")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
+        return commentService.save(comment).flatMap(c -> notificationService.save(new Notification(comment.getPid(), comment.getAlbum(), "albumBeCommented", "url")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
     }
 }

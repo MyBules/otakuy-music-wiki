@@ -34,8 +34,8 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query("{'_id': ?0 ,'status': { '$ne' : \"reject\"}}")
     Mono<Album> findByIdAndStatusNotReject(String id);
 
-    @ExistsQuery("{'_id': ?0 , 'status' :\"active\" }")
-    Mono<Boolean> existByIdAndStatusActive(String id);
+    @Query(value = "{'_id': ?0 , 'status' :\"active\" }", fields = "{'owner' : 1}")
+    Mono<Album> findByIdAndStatusActive(String id);
 
     @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);

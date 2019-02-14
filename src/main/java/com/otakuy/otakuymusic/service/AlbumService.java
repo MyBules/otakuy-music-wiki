@@ -112,8 +112,8 @@ public class AlbumService {
     }
 
     //按照id查找专辑且状态为审核通过
-    public Mono<Boolean> existByIdAndStatusActive(String album_id) {
-        return albumRepository.existByIdAndStatusActive(album_id);
+    public Mono<Album> findByIdAndStatusActive(String album_id) {
+        return albumRepository.findByIdAndStatusActive(album_id);
     }
 
     public Mono<Album> findByIdAndStatusNotReject(String album_id) {

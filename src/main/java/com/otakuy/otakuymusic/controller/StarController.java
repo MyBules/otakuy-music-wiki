@@ -39,10 +39,8 @@ public class StarController {
     //按专辑获取打赏列表
     @GetMapping("/albums/{album_id}/star")
     public Mono<ResponseEntity<Result<List<Star>>>> get(@PathVariable("album_id") String album_id) {
-        return albumService.existByIdAndStatusActive(album_id).flatMap(exist -> {
-            if (exist)
+        return albumService.findByIdAndStatusActive(album_id).flatMap(album -> {
                 return starService.findAllByStarAt(album_id).collectList().map(list -> ResponseEntity.ok(new Result<>("拉取成功", list)));
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
-        });
+        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 }

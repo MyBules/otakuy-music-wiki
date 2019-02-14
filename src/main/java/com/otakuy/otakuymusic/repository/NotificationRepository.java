@@ -11,6 +11,6 @@ import reactor.core.publisher.Mono;
 public interface NotificationRepository extends ReactiveMongoRepository<Notification, String> {
     Flux<Notification> findAllByIsReadAndOwner(boolean isRead, String owner);
 
-    @ExistsQuery("{'owner': ?0 ,'isRead': flase }")
+    @ExistsQuery("{'owner': ?0 ,'isRead': false }")
     Mono<Boolean> existByIsReadAndOwner(String user_id);
 }

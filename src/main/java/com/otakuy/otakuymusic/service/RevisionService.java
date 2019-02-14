@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.service;
 
+import com.mongodb.client.result.UpdateResult;
 import com.otakuy.otakuymusic.exception.RevisionQueueFullException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
@@ -8,6 +9,9 @@ import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.repository.RevisionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,11 +19,14 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RevisionService {
     private final AlbumRepository albumRepository;
     private final RevisionRepository revisionRepository;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     //维护者应用协助者发起的更改
     public Mono<Album> commitRevision(Revision revision) {
@@ -49,6 +56,12 @@ public class RevisionService {
                 return (Mono<Revision>) revisionRepository.save(revision);
             throw new RevisionQueueFullException(new Result<>(HttpStatus.BAD_REQUEST, "等待修改队列已满"));
         });
+    }
+
+    //保存修改请求到数据库
+    public Mono<UpdateResult> updateStatus(Revision revision, String status) {
+        return reactiveMongoTemplate.updateFirst(new Query(where("_id").is(revision.getId())),
+                new Update().set("status", status), Revision.class);
     }
 
     public Flux<Revision> findAllByAlbum(String album_id) {

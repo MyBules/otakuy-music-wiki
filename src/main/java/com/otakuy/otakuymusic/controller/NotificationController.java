@@ -33,16 +33,8 @@ public class NotificationController {
     public Mono<ResponseEntity<Result<List<Notification>>>> getUnreadList(@RequestHeader("Authorization") String token, @RequestParam("isRead") Boolean isRead) {
         return notificationService.findAllByIsReadAndOwner(isRead, jwtUtil.getId(token)).collectList().map(list -> {
             if (!isRead)
-                // list.stream().parallel().map(Notification::getId).collect(Collectors.toList());
                 reactiveMongoTemplate.updateFirst(new Query(where("_id").in(list.stream().parallel().map(Notification::getId).collect(Collectors.toList()))),
-                        new Update().set("isRead", true), Notification.class);
-/*            list.forEach(notification -> {
-                notification.setIsRead(true);
-                notificationService.save(notification).subscribe();
-
-                reactiveMongoTemplate.
-                        new Update()
-            });*/
+                        new Update().set("isRead", true), Notification.class).subscribe();
             return ResponseEntity.ok().body(new Result<>("拉取成功", list));
         });
     }

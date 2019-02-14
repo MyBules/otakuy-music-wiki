@@ -1,7 +1,7 @@
 package com.otakuy.otakuymusic.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 @Data
 @Document(collection = "notification")
-@AllArgsConstructor
+@NoArgsConstructor
 public class Notification {
     @Id
     private String id;
@@ -21,6 +21,16 @@ public class Notification {
     private String content;
     private String url;
     public final static HashMap ACTIONMAP;
+
+    public Notification(String owner, String albumId, String content, String url) {
+        this.id = null;
+        this.owner = owner;
+        this.albumId = albumId;
+        this.isRead = false;
+        this.creatTime = new Date();
+        this.content = (String) ACTIONMAP.get(content);
+        this.url = url;
+    }
 
     static {
         ACTIONMAP = new HashMap<String, String>() {{
