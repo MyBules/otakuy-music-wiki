@@ -1,4 +1,4 @@
-# otakuy-music-wiki(开发中90%)
+# otakuy-music-wiki
 ***
 
 [otakuy-music-wiki](https://otakuy,com)(宅乐(yue)维基)
