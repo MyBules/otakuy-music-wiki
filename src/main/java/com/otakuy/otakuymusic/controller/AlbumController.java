@@ -32,7 +32,7 @@ public class AlbumController {
     //增加新的专辑
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
-        return albumService.create(albumUtil.initNew(token, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("创建成功", newAlbum)));
+        return albumService.create(albumUtil.initNew(token, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("新的维护创建成功,等待审核", newAlbum)));
     }
 
     //删除专辑(审核不通过专辑也可以删除)
@@ -46,9 +46,9 @@ public class AlbumController {
     }
 
     //修改专辑(审核不通过专辑也可以修改)
-    @PutMapping("/albums")
-    public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
-        return albumService.findById(album.getId()).map(oldAlbum -> {
+    @PutMapping("/albums/{album_id}")
+    public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @Validated @RequestBody Album album) {
+        return albumService.findById(album_id).map(oldAlbum -> {
             albumUtil.checkAuthority(token, oldAlbum);
             Album newAlbum = albumUtil.update(oldAlbum, album);
             albumService.save(newAlbum).subscribe();
@@ -57,7 +57,7 @@ public class AlbumController {
     }
 
     //上传指定专辑的封面
-    @PostMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadCover(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
         return albumService.findById(album_id).map(album -> {
             albumUtil.checkAuthority(token, album);
@@ -78,11 +78,8 @@ public class AlbumController {
                     return albumService.checkPermission(token, album).map(result -> {
                         if (!result)
                             album.setDownloadRes(null);
-                        return ResponseEntity.status(HttpStatus.OK).body(new Result<>("success", album));
+                        return ResponseEntity.status(HttpStatus.OK).body(new Result<>("拉取专辑详细成功", album));
                     });
-                   /* if (!(albumService.checkPermission(token, album) || albumUtil.checkAuthorityWithoutThrowException(token, album)))
-                        album.setDownloadRes(null);
-                    return ResponseEntity.status(HttpStatus.OK).body(new Result<>("success", album));*/
                 }
         ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
@@ -102,13 +99,13 @@ public class AlbumController {
     //依赖豆瓣api根据指定专辑名匹配专辑
     @GetMapping("/douban")
     public Mono<ResponseEntity<Result<List<AlbumSuggestion>>>> getAlbumSuggestionByDouban(@RequestParam String title) throws UnsupportedEncodingException {
-        return Mono.just(ResponseEntity.ok(new Result<>("ok", albumService.getAlbumSuggestionByDouban(title))));
+        return Mono.just(ResponseEntity.ok(new Result<>("以下是搜索建议", albumService.getAlbumSuggestionByDouban(title))));
     }
 
     //依赖豆瓣api获取专辑详细信息
     @GetMapping("/douban/{douban_id}")
     public Mono<ResponseEntity<Result<Album>>> getAlbumDetailByDouban(@PathVariable("douban_id") String douban_id) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("ok", albumService.getAlbumDetailByDouban(douban_id))));
+        return Mono.just(ResponseEntity.ok(new Result<>("拉取成功", albumService.getAlbumDetailByDouban(douban_id))));
     }
 
     /*    //确认修改

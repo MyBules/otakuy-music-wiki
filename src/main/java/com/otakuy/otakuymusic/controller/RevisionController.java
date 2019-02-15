@@ -46,7 +46,7 @@ public class RevisionController {
     //查看专辑下所有等待修改队列
     @GetMapping("/albums/{album_id}/revisions")
     public Mono<ResponseEntity<Result<List<Revision>>>> pull(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
-        return revisionService.findAllByAlbum(album_id).collectList().map(revisions -> ResponseEntity.ok().body(new Result<>("共" + revisions.size() + "等待审核的修改提交", revisions)));
+        return revisionService.findAllByAlbum(album_id).collectList().map(revisions -> ResponseEntity.ok().body(new Result<>("共" + revisions.size() + "条等待审核的修改提交", revisions)));
     }
 
     //维护者应用修改

@@ -51,8 +51,8 @@ public class CheckController {
     public Mono<ResponseEntity<Result<Boolean>>> checkAlbumByTitle(@RequestParam String title) {
         return albumService.findAllByTitleAndStatusNotReject(title).hasElements().map(exit -> {
             if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "专辑名校验不通过(已存在相同专辑名)", false));
-            return ResponseEntity.ok(new Result<>("专辑名有效", true));
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "专辑标题校验不通过:已存在相同专辑名", false));
+            return ResponseEntity.ok(new Result<>("专辑标题有效", true));
         });
     }
 }

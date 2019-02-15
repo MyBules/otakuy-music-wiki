@@ -29,6 +29,7 @@ public class User implements UserDetails {
     @URL(message = "非有效URL")
     private String avatar;
     @Email(message = "非有效邮箱地址")
+    @NotBlank
     private String email;
     private String intro;
     private Integer star;

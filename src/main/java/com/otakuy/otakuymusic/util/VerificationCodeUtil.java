@@ -1,6 +1,7 @@
 package com.otakuy.otakuymusic.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -34,8 +35,9 @@ public class VerificationCodeUtil {
     }
 
     @Data
-    @Document(collection = "verificationCode")
     @NoArgsConstructor
+    @Document(collection = "verificationCode")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class VerificationCode {
         @Id
         private String id;

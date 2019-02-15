@@ -27,6 +27,7 @@ public class AdminController { //暂时只做专辑审核以及查看专辑,用�
     private final UserService userService;
     private final NotificationService notificationService;
 
+    //设置推荐专辑
     //专辑审核
     @GetMapping("/albums/{album_id}/auditing")
     public Mono<ResponseEntity<Result<String>>> auditingAlbum(@PathVariable("album_id") String album_id, @RequestParam String status) {

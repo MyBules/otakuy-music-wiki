@@ -56,19 +56,4 @@ public class OtakuyExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("登录异常"));
         // return null;
     }*/
-/*
-    @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
-    public ResponseEntity handleBindException(MethodArgumentNotValidException ex) {
-       */
-/* FieldError fieldError = ex.getBindingResult().getFieldError();
-        log.info("参数校验异常:{}({})", fieldError.getDefaultMessage(),fieldError.getField());
-        Map<String,Object> result = new HashMap<String,Object>();
-        result.put("respCode", "01002");
-        result.put("respMsg", fieldError.getDefaultMessage());
-        return result;*//*
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("登录异常"));
-
-    }
-*/
 }

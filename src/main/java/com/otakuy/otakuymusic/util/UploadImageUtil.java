@@ -19,7 +19,7 @@ public class UploadImageUtil {
     public void uploadImage(FilePart filePart, String path, Runnable doOnComplete) throws IOException {
         String filename = filePart.filename();
         if (!filename.endsWith(".jpg") && !filename.endsWith(".png"))
-            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST, "图片格式不支持,上传专辑封面失败"));
+            throw new UnsupportedFormatException(new Result<>(HttpStatus.BAD_REQUEST, "图片格式不支持,上传失败"));
         Path image = Paths.get(path);
         if (!Files.exists(image))
             image = Files.createFile(image);

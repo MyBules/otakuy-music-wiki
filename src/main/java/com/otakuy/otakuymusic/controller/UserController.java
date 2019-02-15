@@ -45,9 +45,9 @@ public class UserController {
     public Mono<ResponseEntity<Result<String>>> login(@Validated @RequestBody AuthRequest authRequest) {
         return userService.findByUsername(authRequest.getUsername()).map(userDetails -> {
             if (passwordEncoder.encode(authRequest.getPassword()).equals(userDetails.getPassword())) {
-                return ResponseEntity.ok(new Result<>("ok", jwtUtil.generateToken(userDetails)));
+                return ResponseEntity.ok(new Result<>("登录成功", jwtUtil.generateToken(userDetails)));
             }
-            throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "用户名或密码错误"));
+            throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "登录失败:用户名或密码错误"));
         });
     }
 
@@ -101,22 +101,19 @@ public class UserController {
     public Mono<ResponseEntity<Result<String>>> modifyPassword(@RequestParam String email, @RequestParam String verificationCode, @RequestParam String verificationCodeId, @RequestParam String password) throws IOException {
         return verificationCodeService.checkPasswordVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode, email)).hasElement().flatMap(exist -> {
             if (!exist)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "链接错误或失效", "重置密码失败"));
-            return userService.modifyPassword(email, password).hasElement().map(userExist -> {
-                if (!userExist)
-                    throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "邮箱不存在"));
-                return ResponseEntity.ok(new Result<>("修改密码成功"));
-            });
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "重置密码失败:链接错误或失效"));
+            return userService.modifyPassword(email, password).map(user -> ResponseEntity.ok(new Result<>("修改密码成功")));
         });
     }
 
     //按照id查看用户信息
     @GetMapping("/users/{user_id}")
     public Mono<ResponseEntity<Result<User>>> findById(@PathVariable("user_id") String user_id) {
-        return userService.findById(user_id).map(user -> ResponseEntity.ok(new Result<>("注册完成", user))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
+        return userService.findById(user_id).map(user -> ResponseEntity.ok(new Result<>("成功拉取" + user.getUsername() + "的个人信息", user))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
     }
 
     //修改用户信息
+    @PutMapping("/users/{user_id}")
     public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @Validated @RequestBody User user) {
         return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
                 userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))

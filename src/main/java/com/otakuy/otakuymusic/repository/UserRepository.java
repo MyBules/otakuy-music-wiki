@@ -21,4 +21,7 @@ public interface UserRepository extends ReactiveMongoRepository<User, String> {
     Mono<User> findStarById(String id);
 
     Flux<User> findAllByEnabled(Boolean isEnable, Pageable pageable);
+
+    @Query(value = "{'_id': ?0}", fields = "{'avatar' : 1,'_id' : 0}")
+    Mono<User> findAvatarById(String id);
 }

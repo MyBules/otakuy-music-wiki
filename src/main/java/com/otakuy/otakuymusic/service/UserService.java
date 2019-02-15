@@ -92,4 +92,8 @@ public class UserService {
     public Flux<User> findAllByEnabled(Boolean isEnable, Pageable pageable) {
         return userRepository.findAllByEnabled(isEnable, pageable);
     }
+
+    public Mono<User> findAvatarById(String id) {
+        return userRepository.findAvatarById(id);
+    }
 }

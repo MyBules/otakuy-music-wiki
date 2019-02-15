@@ -101,7 +101,7 @@ public class AlbumService {
     public Mono<Album> create(Album album) {
         return albumRepository.findAllByTitleAndStatusNotReject(album.getTitle()).hasElements().flatMap(exit -> {
             if (exit)
-                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "重复专辑名"));
+                throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "已存在同标题活跃专辑"));
             return albumRepository.save(album);
         });
     }

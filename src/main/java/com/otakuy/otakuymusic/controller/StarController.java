@@ -29,7 +29,7 @@ public class StarController {
     //打赏
     @PostMapping("/albums/{album_id}/star")
     public Mono<ResponseEntity<Result<Star>>> create(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestBody Star star) {
-        return userService.findStarById(star.getStarTo()).flatMap(sum -> {
+        return userService.findStarById(jwtUtil.getId(token)).flatMap(sum -> {
             star.setStarFrom(jwtUtil.getId(token));
             star.setStarAt(album_id);
             if (sum >= star.getNum() && !star.getStarTo().equals(star.getStarFrom())) {
