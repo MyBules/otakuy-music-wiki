@@ -29,6 +29,12 @@ public class AlbumController {
     private final AlbumService albumService;
     private final AlbumUtil albumUtil;
 
+    //按照加入时间拉取活跃状态专辑列表
+    @GetMapping("/albums")
+    public Mono<ResponseEntity<Result<List<Album>>>> getAlbumList(@RequestParam Integer page) {
+        return albumService.findAllByStatus("active", PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok().body(new Result<>("拉取专辑列表成功", albums)));
+    }
+
     //增加新的专辑
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {

@@ -42,13 +42,13 @@ public class UserController {
 
     //用户登录
     @PostMapping("/login")
-    public Mono<ResponseEntity<Result<String>>> login(@Validated @RequestBody AuthRequest authRequest) {
+    public Mono<ResponseEntity<Result<User>>> login(@Validated @RequestBody AuthRequest authRequest) {
         return userService.findByUsername(authRequest.getUsername()).map(userDetails -> {
             if (passwordEncoder.encode(authRequest.getPassword()).equals(userDetails.getPassword())) {
-                return ResponseEntity.ok(new Result<>("登录成功", jwtUtil.generateToken(userDetails)));
+                return ResponseEntity.ok().header("Authorization", jwtUtil.generateToken(userDetails)).body(new Result<>("登录成功", userDetails));
             }
             throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "登录失败:用户名或密码错误"));
-        });
+        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在")));
     }
 
     //用户注册

@@ -6,7 +6,7 @@ encoder:
   keylength: 256
 jjwt:
   secret: 生蚝QAQ只是一位兴趣使然的面向ACG编程人员(●'◡'●)ﾉ♥♥♥♥♥♥
-  expirationTime: 28800
+  expirationTime: 864000
 spring:
   data:
     mongodb:

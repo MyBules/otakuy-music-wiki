@@ -17,20 +17,22 @@ public class Comment {
     @NotBlank
     private String album;
     @NotBlank
-    private String pid;//最上级pid为用户id
+    private String to_id;//最上级pid为用户id
+    @NotBlank
+    private String to_username;//最上级pid为用户id
     @Id
     private String id;
-    private String user_id;
-    private String user_cover;
-    private String user_username;
+    @NotBlank
+    private String from_id;
+    @NotBlank
+    private String from_username;
     @NotBlank
     private String content;
     private Date createTime;
 
     public void init(User user) {
-        this.user_cover = user.getAvatar();
-        this.user_id = user.getId();
+        this.from_id = user.getId();
         this.createTime = new Date();
-        this.user_username = user.getUsername();
+        this.from_username = user.getUsername();
     }
 }
