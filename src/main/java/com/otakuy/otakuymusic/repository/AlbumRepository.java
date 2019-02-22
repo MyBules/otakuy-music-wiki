@@ -13,15 +13,16 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByOwner(String owner, Pageable pageable);
 
-    @Query("{'owner': ?0 ,'status': { '$ne' : \"reject\"}}")
+    @Query(value = "{'owner': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable);
 
-    @Query("{'owner': ?0 ,'status': \"active\"}")
+    @Query(value = "{'owner': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByOwnerAndStatusActive(String owner, Pageable pageable);
 
+    @Query(value = "{'title': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByTitle(String title, Pageable pageable);
 
-    @Query("{'title': ?0 ,'status': { '$ne' : \"reject\"}}")
+    @Query(value = "{'title': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByTitleAndStatusNotReject(String title);
 
     @Query(value = "{'title': {$regex:?0 ,$options:'i'} ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
@@ -39,5 +40,6 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);
 
+    @Query(value = "{'status': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
     Flux<Album> findAllByStatus(String status, Pageable pageable);
 }

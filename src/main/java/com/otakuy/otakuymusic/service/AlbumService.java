@@ -38,6 +38,10 @@ public class AlbumService {
         return albumRepository.findAllByOwner(owner, pageable);
     }
 
+    public Flux<Album> findAllByOwnerAndStatusActive(String owner, Pageable pageable) {
+        return albumRepository.findAllByOwnerAndStatusActive(owner, pageable);
+    }
+
     public Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable) {
         return albumRepository.findAllByOwnerAndStatusNotReject(owner, pageable);
     }

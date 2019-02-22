@@ -96,6 +96,12 @@ public class AlbumController {
         return albumService.findAllByOwner(owner, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张维护专辑", albums))).defaultIfEmpty(ResponseEntity.ok(new Result<>("该用户不存在或者没有专辑", null)));
     }
 
+    //查找指定用户的所有维护的专辑(包含通过)
+    @GetMapping("/uers/{owner}/albums/active")
+    public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwnerAndStatusActive(@PathVariable("owner") String owner, @RequestParam Integer page) {
+        return albumService.findAllByOwner(owner, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张维护专辑", albums))).defaultIfEmpty(ResponseEntity.ok(new Result<>("该用户不存在或者没有专辑", null)));
+    }
+
     //获取首页轮播展示专辑 只返回专辑cover title intro
     @GetMapping("/albums/recommendAlbum")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByIsRecommend() {
