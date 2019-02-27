@@ -54,7 +54,8 @@ public class UserController {
     //用户注册
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
-        return verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement().flatMap(exist ->
+        log.info("start");
+        Mono<ResponseEntity<Result<?>>> responseEntityMono = verificationCodeService.checkVerificationCode(new VerificationCodeUtil.VerificationCode(verificationCodeId, verificationCode)).hasElement().flatMap(exist ->
         {
             if (!exist)
                 throw new CheckException(new Result<>(HttpStatus.BAD_REQUEST, "验证码失效或错误"));
@@ -62,15 +63,11 @@ public class UserController {
                     userExist -> {
                         if (userExist)
                             throw new CheckException(new Result<>(HttpStatus.CONFLICT, "用户名或邮箱已被注册"));
-                        user.setId(null);
-                        user.setEnabled(true);
-                        user.setRole(Arrays.asList(Role.ROLE_USER));
-                        user.setPassword(passwordEncoder.encode(user.getPassword()));
-                        user.setAvatar("https://avatar.otakuy.com/default.png");
-                        user.setStar(0);
-                        return userService.userRegister(user).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
+                        return userService.userRegister(userUtil.init(user)).map(u -> ResponseEntity.ok(new Result<>("注册完成", user)));
                     });
         });
+        log.info("over");
+        return responseEntityMono;
     }
 
     //更改头像

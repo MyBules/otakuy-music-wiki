@@ -44,21 +44,21 @@ public class AlbumController {
     //删除专辑(审核不通过专辑也可以删除)
     @DeleteMapping("/albums/{album_id}")
     public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
-        return albumService.findById(album_id).map(album -> {
+        return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
-            albumService.delete(album).subscribe();
-            return ResponseEntity.status(HttpStatus.OK).body(new Result<String>("删除成功"));
+            // albumService.delete(album).subscribe();
+            return albumService.delete(album).map(x -> ResponseEntity.status(HttpStatus.OK).body(new Result<String>("删除成功")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 
     //修改专辑(审核不通过专辑也可以修改)
     @PutMapping("/albums/{album_id}")
     public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @Validated @RequestBody Album album) {
-        return albumService.findById(album_id).map(oldAlbum -> {
+        return albumService.findById(album_id).flatMap(oldAlbum -> {
             albumUtil.checkAuthority(token, oldAlbum);
-            Album newAlbum = albumUtil.update(oldAlbum, album);
-            albumService.save(newAlbum).subscribe();
-            return ResponseEntity.status(HttpStatus.OK).body(new Result<>("更新成功", newAlbum));
+            //   Album newAlbum = albumUtil.update(oldAlbum, album);
+            //  albumService.save(albumUtil.update(oldAlbum, album)).subscribe();
+            return albumService.save(albumUtil.update(oldAlbum, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("更新成功", newAlbum)));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 
@@ -80,13 +80,11 @@ public class AlbumController {
     //查看专辑详细
     @GetMapping("/albums/{album_id}")
     public Mono<ResponseEntity<Result<Album>>> findById(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
-        return albumService.findById(album_id).flatMap(album -> {
-                    return albumService.checkPermission(token, album).map(result -> {
-                        if (!result)
-                            album.setDownloadRes(null);
-                        return ResponseEntity.status(HttpStatus.OK).body(new Result<>("拉取专辑详细成功", album));
-                    });
-                }
+        return albumService.findById(album_id).flatMap(album -> albumService.checkPermission(token, album).map(result -> {
+                    if (!result)
+                        album.setDownloadRes(null);
+                    return ResponseEntity.status(HttpStatus.OK).body(new Result<>("拉取专辑详细成功", album));
+                })
         ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 

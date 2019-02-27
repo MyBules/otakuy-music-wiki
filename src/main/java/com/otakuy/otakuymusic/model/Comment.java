@@ -30,9 +30,10 @@ public class Comment {
     private String content;
     private Date createTime;
 
-    public void init(User user) {
+    public Comment init(User user) {
         this.from_id = user.getId();
         this.createTime = new Date();
         this.from_username = user.getUsername();
+        return this;
     }
 }
