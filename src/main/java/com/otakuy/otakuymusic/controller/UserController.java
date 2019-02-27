@@ -4,7 +4,6 @@ import com.otakuy.otakuymusic.exception.CheckException;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
-import com.otakuy.otakuymusic.model.security.Role;
 import com.otakuy.otakuymusic.service.EmailService;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.service.VerificationCodeService;
@@ -26,7 +25,6 @@ import reactor.core.publisher.Mono;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Arrays;
 
 @Log4j2
 @RestController
@@ -110,11 +108,16 @@ public class UserController {
     }
 
     //修改用户信息
-    @PutMapping("/users/{user_id}")
+/*    @PutMapping("/users/{user_id}")
     public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @Validated @RequestBody User user) {
         return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
                 userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
         ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
+    }*/
+    @PutMapping("/users/{user_id}/intro")
+    public Mono<ResponseEntity<Result<User>>> updateIntro(@RequestHeader("Authorization") String token, @Validated @RequestParam String intro) {
+        return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
+                userService.updatePersonalInformation(userUtil.update(oldUser, intro)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
+        ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
     }
-
 }

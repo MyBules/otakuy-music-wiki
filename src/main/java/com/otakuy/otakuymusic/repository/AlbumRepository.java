@@ -10,25 +10,25 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface AlbumRepository extends ReactiveMongoRepository<Album, String> {
-    @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByOwner(String owner, Pageable pageable);
 
-    @Query(value = "{'owner': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'owner': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable);
 
-    @Query(value = "{'owner': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'owner': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByOwnerAndStatusActive(String owner, Pageable pageable);
 
-    @Query(value = "{'title': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'title': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByTitle(String title, Pageable pageable);
 
-    @Query(value = "{'title': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'title': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByTitleAndStatusNotReject(String title);
 
-    @Query(value = "{'title': {$regex:?0 ,$options:'i'} ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'title': {$regex:?0 ,$options:'i'} ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByTitleAndStatusActive(String title, Pageable pageable);
 
-    @Query(value = "{'tags.name': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'tags.name': ?0 ,'status': \"active\"}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByTagAndStatusActive(String tag, Pageable pageable);
 
     @Query("{'_id': ?0 ,'status': { '$ne' : \"reject\"}}")
@@ -37,9 +37,9 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query(value = "{'_id': ?0 , 'status' :\"active\" }", fields = "{'owner' : 1}")
     Mono<Album> findByIdAndStatusActive(String id);
 
-    @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);
 
-    @Query(value = "{'status': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1}")
+    @Query(value = "{'status': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByStatus(String status, Pageable pageable);
 }

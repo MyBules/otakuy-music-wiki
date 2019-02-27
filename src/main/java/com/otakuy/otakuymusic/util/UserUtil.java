@@ -13,8 +13,8 @@ import java.util.Arrays;
 public class UserUtil {
     private final PBKDF2Encoder passwordEncoder;
     //用户资料更新
-    public User update(User oldUser, User user) {
-        oldUser.setIntro(user.getIntro());
+    public User update(User oldUser, String intro) {
+        oldUser.setIntro(intro);
         return oldUser;
     }
 
