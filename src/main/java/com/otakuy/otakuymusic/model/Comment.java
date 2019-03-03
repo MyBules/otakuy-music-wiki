@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import java.text.DateFormat;
 import java.util.Date;
 
 @Data
@@ -22,17 +23,15 @@ public class Comment {
     private String to_username;//最上级pid为用户id
     @Id
     private String id;
-    @NotBlank
     private String from_id;
-    @NotBlank
     private String from_username;
     @NotBlank
     private String content;
-    private Date createTime;
+    private String createTime;
 
     public Comment init(User user) {
         this.from_id = user.getId();
-        this.createTime = new Date();
+        this.createTime = DateFormat.getDateInstance().format(new Date()) ;
         this.from_username = user.getUsername();
         return this;
     }
