@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlbumUtil {
@@ -21,6 +24,7 @@ public class AlbumUtil {
         album.setStatus("block");
         album.setIsRecommend(false);
         album.setCover("https://cover.otakuy.com/default.png");
+        album.setCreateTime(DateFormat.getDateInstance().format(new Date()));
         return album;
     }
 
@@ -52,11 +56,12 @@ public class AlbumUtil {
             throw new AuthorityException((new Result<>(HttpStatus.UNAUTHORIZED, "权限不足")));
         return true;
     }
+
     //验证专辑所有权
     public Boolean checkAuthorityWithoutThrowException(String token, Album album) {
         String id = jwtUtil.getId(token);
         if (!album.getOwner().equals(jwtUtil.getId(token)))
-           return false;
+            return false;
         return true;
     }
 

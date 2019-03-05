@@ -39,5 +39,5 @@ public class Album {
     private String status;
     private Boolean isRecommend;
 
-
+    private String createTime;
 }

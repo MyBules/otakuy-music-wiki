@@ -128,6 +128,10 @@ public class AlbumService {
         return albumRepository.findAllByTagAndStatusActive(tag, pageable);
     }
 
+    public Flux<Album> findAllByArtistAndStatusActive(String artist, Pageable pageable) {
+        return albumRepository.findAllByArtistAndStatusActive(artist, pageable);
+    }
+
     public Flux<Album> findAllByTitleAndStatusActive(String title, Pageable pageable) {
         return albumRepository.findAllByTitleAndStatusActive(title, pageable);
     }

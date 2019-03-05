@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 
 @Data
@@ -17,6 +18,7 @@ public class Revision<T> {
     private String committer;
     @NotBlank
     private String modificationPoint;
+    @NotNull
     private T content;
     private String status;
     public final static HashMap MODIFICATION_POINT_MAP;

@@ -26,7 +26,7 @@ import java.util.List;
 public class SearchController {
     private final UserService userService;
     private final AlbumService albumService;
-
+/*
     //根据指定标题模糊搜索专辑
     @GetMapping("/byTitle")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByTitleAndStatusNotReject(@RequestParam String title, @RequestParam Integer page) {
@@ -37,7 +37,7 @@ public class SearchController {
     @GetMapping("/byTag")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByTagAndStatusNotReject(@RequestParam String tag, @RequestParam Integer page) {
         return albumService.findAllByTagAndStatusActive(tag, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
-    }
+    }*/
 
     //根据指定用户名模糊搜索用户
     @GetMapping("/users")

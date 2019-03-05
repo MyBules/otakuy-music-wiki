@@ -31,7 +31,7 @@ public class Comment {
 
     public Comment init(User user) {
         this.from_id = user.getId();
-        this.createTime = DateFormat.getDateInstance().format(new Date()) ;
+        this.createTime = DateFormat.getDateInstance().format(new Date());
         this.from_username = user.getUsername();
         return this;
     }
