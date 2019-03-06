@@ -44,6 +44,10 @@ public class Notification {
             put("revisionBeReject", "您提交的修改被拒绝");
 
             put("newAlbumBeCommitted", "新的专辑等待审核");//被拒绝专辑也可以重新编辑后提交审核
+
+            put("commentBeReply", "收到回复");
+
+
             //put("newAlbumBeCommitted", "新的专辑等待审核");
         }};
     }
