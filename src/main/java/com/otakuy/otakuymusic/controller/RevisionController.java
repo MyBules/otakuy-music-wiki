@@ -38,7 +38,7 @@ public class RevisionController {
             if (revision.getCommitter().equals(album.getOwner()))
                 return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<String>("不能对自己的专辑提交修改请求")));
             revision.setStatus("block");
-            return revisionService.save(revision).flatMap(then -> notificationService.save(new Notification(album.getOwner(), album.getId(), "albumBeRequestedRevision", "url")).map(notification -> ResponseEntity.ok().body(new Result<String>("提交修改成功,等待维护者审核"))));
+            return revisionService.save(revision).flatMap(then -> notificationService.save(new Notification(album.getOwner(), album.getId(), "albumBeRequestedRevision")).map(notification -> ResponseEntity.ok().body(new Result<String>("提交修改成功,等待维护者审核"))));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在或未审核通过")));
 
     }
@@ -55,7 +55,7 @@ public class RevisionController {
         return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
             return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> {
-                userService.updateStarById(revision.getCommitter(), 10).then(revisionService.updateStatus(revision, "active")).then(notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeActive", ""))).subscribe();//加分且将修改状态修改为活跃
+                userService.updateStarById(revision.getCommitter(), 10).then(revisionService.updateStatus(revision, "active")).then(notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeActive"))).subscribe();//加分且将修改状态修改为活跃
                 return revisionService.commitRevision(revision).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)));
             }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
@@ -64,6 +64,6 @@ public class RevisionController {
     //维护者拒绝修改
     @DeleteMapping("/albums/{album_id}/revisions/{revision_id}")
     public Mono<ResponseEntity<Result<String>>> reject(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @PathVariable("revision_id") String revision_id) {
-        return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> revisionService.updateStatus(revision, "false").then(notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeReject", ""))).map(then -> ResponseEntity.status(HttpStatus.OK).body(new Result<String>("拒绝修改成功")))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
+        return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> revisionService.updateStatus(revision, "false").then(notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeReject"))).map(then -> ResponseEntity.status(HttpStatus.OK).body(new Result<String>("拒绝修改成功")))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
     }
 }

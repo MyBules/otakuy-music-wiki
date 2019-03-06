@@ -33,7 +33,7 @@ public class StarController {
             star.setStarFrom(jwtUtil.getId(token));
             star.setStarAt(album_id);
             if (sum >= star.getNum() && !star.getStarTo().equals(star.getStarFrom())) {
-                return starService.create(star).then(notificationService.save(new Notification(star.getStarTo(), star.getStarAt(), "albumBeStarred", "url"))).map(then -> ResponseEntity.ok(new Result<Star>("打赏成功")));
+                return starService.create(star).then(notificationService.save(new Notification(star.getStarTo(), star.getStarAt(), "albumBeStarred"))).map(then -> ResponseEntity.ok(new Result<Star>("打赏成功")));
             }
             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<Star>("拥有star数不足or自己给自己打赏是不行的哦")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("被打赏用户不存在")));

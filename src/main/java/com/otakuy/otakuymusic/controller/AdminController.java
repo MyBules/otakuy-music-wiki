@@ -33,7 +33,7 @@ public class AdminController { //暂时只做专辑审核以及查看专辑,用�
     public Mono<ResponseEntity<Result<String>>> auditingAlbum(@PathVariable("album_id") String album_id, @RequestParam String status) {
         return albumService.findByIdAndStatusNotReject(album_id).flatMap(album -> {
             album.setStatus(status);
-            return albumService.save(album).then(notificationService.save(new Notification(album.getOwner(), album.getId(), "albumBe" + status.substring(0, 1).toUpperCase() + status.substring(1), "url"))).map(a -> ResponseEntity.ok().body(new Result<>("专辑审核成功")));
+            return albumService.save(album).then(notificationService.save(new Notification(album.getOwner(), album.getId(), "albumBe" + status.substring(0, 1).toUpperCase() + status.substring(1)))).map(a -> ResponseEntity.ok().body(new Result<>("专辑审核成功")));
         });
     }
 

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -17,19 +18,17 @@ public class Notification {
     private String owner;
     private String albumId;
     private Boolean isRead;
-    private Date creatTime;
+    private String creatTime;
     private String content;
-    private String url;
     public final static HashMap ACTIONMAP;
 
-    public Notification(String owner, String albumId, String content, String url) {
+    public Notification(String owner, String albumId, String content) {
         this.id = null;
         this.owner = owner;
         this.albumId = albumId;
         this.isRead = false;
-        this.creatTime = new Date();
+        this.creatTime = DateFormat.getDateInstance().format(new Date());
         this.content = (String) ACTIONMAP.get(content);
-        this.url = url;
     }
 
     static {

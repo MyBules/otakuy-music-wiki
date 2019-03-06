@@ -37,7 +37,7 @@ public class CommentController {
     public Mono<ResponseEntity<Result<Comment>>> pushComment(@RequestHeader("Authorization") String token, @Validated @RequestBody Comment comment) {
         return userService.findById(jwtUtil.getId(token)).flatMap(user -> {
             //comment.init(user);
-            return commentService.save(comment.init(user)).flatMap(c -> notificationService.save(new Notification(comment.getTo_id(), comment.getAlbum(), "albumBeCommented", "url")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
+            return commentService.save(comment.init(user)).flatMap(c -> notificationService.save(new Notification(comment.getTo_id(), comment.getAlbum(), "albumBeCommented")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
         });
     }
 }
