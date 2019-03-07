@@ -16,11 +16,13 @@ public class Revision<T> {
     @NotBlank
     private String album;
     private String committer;
+    private String committerName;
     @NotBlank
     private String modificationPoint;
     @NotNull
     private T content;
     private String status;
+    private String createTime;
     public final static HashMap MODIFICATION_POINT_MAP;
 
     static {

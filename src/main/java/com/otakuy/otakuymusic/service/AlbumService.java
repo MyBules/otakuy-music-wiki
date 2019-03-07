@@ -78,12 +78,12 @@ public class AlbumService {
     public String uploadCover(String album_id, FilePart filePart) throws IOException {
         uploadImageUtil.uploadImage(filePart, "E:\\123\\" + album_id + ".png", () -> {
             albumRepository.findById(album_id).flatMap(album -> {
-                album.setCover("https://img.otakuy.com/" + album_id + ".png");
+                album.setCover("https://cover.otakuy.com/" + album_id + ".png");
                 return albumRepository.save(album);
             }).subscribe();
             System.out.println("更新完成");
         });
-        return "https://img.otakuy.com/" + album_id + ".png";
+        return "https://cover.otakuy.com/" + album_id + ".png";
     }
 
     //获取首页展示专辑

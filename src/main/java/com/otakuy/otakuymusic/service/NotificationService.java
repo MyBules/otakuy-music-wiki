@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Notification;
 import com.otakuy.otakuymusic.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -24,7 +25,7 @@ public class NotificationService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Flux<Notification> findAllByIsReadAndOwner(boolean isRead, String owner) {
-        return notificationRepository.findAllByIsReadAndOwner(isRead, owner);
+        return notificationRepository.findAllByIsReadAndOwnerOrderByCreateTimeAsc(isRead, owner, new Sort(Sort.Direction.DESC, "_id"));
     }
 
     public Mono<Notification> save(Notification notification) {

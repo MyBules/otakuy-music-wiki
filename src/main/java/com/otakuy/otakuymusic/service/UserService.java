@@ -53,12 +53,12 @@ public class UserService {
     public String uploadAvatar(String user_id, FilePart filePart) throws IOException {
         uploadImageUtil.uploadImage(filePart, "E:\\123\\" + user_id + ".png", () -> {
             userRepository.findById(user_id).flatMap(user -> {
-                user.setAvatar("https://img.otakuy.com/" + user_id + ".png");
+                user.setAvatar("https://avatar.otakuy.com/" + user_id + ".png");
                 return userRepository.save(user);
             }).subscribe();
             System.out.println("更新完成");
         });
-        return "https://img.otakuy.com/" + user_id + ".png";
+        return "https://avatar.otakuy.com/" + user_id + ".png";
     }
 
     public Mono<User> findById(String user_id) {

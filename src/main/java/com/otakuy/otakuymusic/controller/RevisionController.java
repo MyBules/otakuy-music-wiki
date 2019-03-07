@@ -18,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,6 +36,8 @@ public class RevisionController {
     @PostMapping("/albums/{album_id}/revisions")
     public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Revision revision) {
         return albumService.findByIdAndStatusActive(revision.getAlbum()).flatMap(album -> {
+            revision.setCommitterName(jwtUtil.getUserName(token));
+            revision.setCreateTime(DateFormat.getDateInstance().format(new Date()));
             revision.setCommitter(jwtUtil.getId(token));
             if (revision.getCommitter().equals(album.getOwner()))
                 return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<String>("不能对自己的专辑提交修改请求")));
@@ -53,11 +57,8 @@ public class RevisionController {
     @GetMapping("/albums/{album_id}/revisions/{revision_id}")
     public Mono<ResponseEntity<Result<Album>>> commit(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @PathVariable("revision_id") String revision_id) {
         return albumService.findById(album_id).flatMap(album -> {
-            albumUtil.checkAuthority(token, album);
-            return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> {
-                userService.updateStarById(revision.getCommitter(), 10).then(revisionService.updateStatus(revision, "active")).then(notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeActive"))).subscribe();//加分且将修改状态修改为活跃
-                return revisionService.commitRevision(revision).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)));
-            }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
+            albumUtil.checkAuthority(token, album);//同时消费可以使用zip(关注值)或者when(关注是否完成)
+            return revisionService.findByIdAndStatusBlock(revision_id).flatMap(revision -> Mono.when(userService.updateStarById(revision.getCommitter(), 10), revisionService.updateStatus(revision, "active"), notificationService.save(new Notification(revision.getCommitter(), revision.getAlbum(), "revisionBeActive"))).then(revisionService.commitRevision(revision)).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("应用修改成功", newAlbum)))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("修改不存在")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
 

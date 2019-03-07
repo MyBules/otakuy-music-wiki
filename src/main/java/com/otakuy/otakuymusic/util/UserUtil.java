@@ -24,7 +24,7 @@ public class UserUtil {
         user.setEnabled(true);
         user.setRole(Arrays.asList(Role.ROLE_USER));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setAvatar("https://avatar.otakuy.com/default.png");
+        user.setAvatar("https://avatar.otakuy.com/" + user.getId() + ".png");
         user.setStar(0);
         return user;
     }
