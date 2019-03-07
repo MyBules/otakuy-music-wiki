@@ -1,5 +1,6 @@
 package com.otakuy.otakuymusic.service;
 
+import com.mongodb.client.result.UpdateResult;
 import com.otakuy.otakuymusic.exception.CheckException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -147,5 +152,10 @@ public class AlbumService {
     //验证是否有查看下载资源资格
     public Mono<Boolean> checkPermission(String token, Album album) {
         return userService.findStarById(jwtUtil.getId(token)).map(star -> star - album.getDownloadRes().getPermission() >= 0 || albumUtil.checkAuthorityWithoutThrowException(token, album));
+    }
+
+    public Mono<UpdateResult> updateIsRecommend(List<String> albums, Boolean isRecommend) {
+        return reactiveMongoTemplate.updateMulti(new Query(where("_id").in(albums)),
+                new Update().set("isRecommend", isRecommend), Album.class);
     }
 }

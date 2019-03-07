@@ -29,7 +29,7 @@ public class AlbumController {
     private final AlbumService albumService;
     private final AlbumUtil albumUtil;
 
-    //按照加入时间拉取活跃状态专辑列表
+    //按照条件拉取活跃状态专辑列表
     @GetMapping("/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> getAlbumList(@RequestParam String filter, @RequestParam String param, @RequestParam Integer page) {
         switch (filter) {

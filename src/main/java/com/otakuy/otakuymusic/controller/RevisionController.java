@@ -18,8 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -36,9 +34,7 @@ public class RevisionController {
     @PostMapping("/albums/{album_id}/revisions")
     public Mono<ResponseEntity<Result<String>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Revision revision) {
         return albumService.findByIdAndStatusActive(revision.getAlbum()).flatMap(album -> {
-            revision.setCommitterName(jwtUtil.getUserName(token));
-            revision.setCreateTime(DateFormat.getDateInstance().format(new Date()));
-            revision.setCommitter(jwtUtil.getId(token));
+            Revision.init(revision, jwtUtil.getUserName(token), jwtUtil.getId(token));
             if (revision.getCommitter().equals(album.getOwner()))
                 return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<String>("不能对自己的专辑提交修改请求")));
             revision.setStatus("block");
@@ -49,8 +45,8 @@ public class RevisionController {
 
     //查看专辑下所有等待修改队列
     @GetMapping("/albums/{album_id}/revisions")
-    public Mono<ResponseEntity<Result<List<Revision>>>> pull(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id,@RequestParam String modificationPoint) {
-        return revisionService.findAllByAlbumAndModificationPoint(album_id,modificationPoint).collectList().map(revisions -> ResponseEntity.ok().body(new Result<>(modificationPoint+"类别下共" + revisions.size() + "条等待审核的修改提交", revisions)));
+    public Mono<ResponseEntity<Result<List<Revision>>>> pull(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestParam String modificationPoint) {
+        return revisionService.findAllByAlbumAndModificationPoint(album_id, modificationPoint).collectList().map(revisions -> ResponseEntity.ok().body(new Result<>(modificationPoint + "类别下共" + revisions.size() + "条等待审核的修改提交", revisions)));
     }
 
     //维护者应用修改

@@ -47,7 +47,6 @@ public class Notification {
 
             put("commentBeReply", "收到回复");
 
-
             //put("newAlbumBeCommitted", "新的专辑等待审核");
         }};
     }

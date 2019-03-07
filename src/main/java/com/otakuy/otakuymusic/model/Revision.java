@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 @Data
@@ -41,6 +43,12 @@ public class Revision<T> {
             put("owner_id", "setOwner_id");
             put("downloadRes", "setDownloadRes");
         }};
+    }
+
+    public static void init(Revision revision, String committerName, String committer) {
+        revision.setCommitterName(committerName);
+        revision.setCreateTime(DateFormat.getDateInstance().format(new Date()));
+        revision.setCommitter(committer);
     }
 
 }

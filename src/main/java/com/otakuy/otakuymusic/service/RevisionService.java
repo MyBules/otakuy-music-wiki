@@ -64,13 +64,9 @@ public class RevisionService {
                 new Update().set("status", status), Revision.class);
     }
 
-    public Flux<Revision> findAllByAlbumAndModificationPoint(String album_id,String modificationPoint) {
-        return revisionRepository.findAllByAlbumAndModificationPoint(album_id,modificationPoint);
+    public Flux<Revision> findAllByAlbumAndModificationPoint(String album_id, String modificationPoint) {
+        return revisionRepository.findAllByAlbumAndModificationPoint(album_id, modificationPoint);
     }
-
-/*    public Mono<Revision> findById(String revision_id) {
-
-    }*/
 
     public Mono<Revision> findByIdAndStatusBlock(String revision_id) {
         return revisionRepository.findByIdAndStatusBlock(revision_id);

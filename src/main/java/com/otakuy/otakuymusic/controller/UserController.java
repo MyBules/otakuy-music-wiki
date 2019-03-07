@@ -108,12 +108,6 @@ public class UserController {
     }
 
     //修改用户信息
-/*    @PutMapping("/users/{user_id}")
-    public Mono<ResponseEntity<Result<User>>> updatePersonalInformation(@RequestHeader("Authorization") String token, @Validated @RequestBody User user) {
-        return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->
-                userService.updatePersonalInformation(userUtil.update(oldUser, user)).map(newUser -> ResponseEntity.ok(new Result<>("更新完成", newUser)))
-        ).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在", null)));
-    }*/
     @PutMapping("/users/{user_id}/intro")
     public Mono<ResponseEntity<Result<User>>> updateIntro(@RequestHeader("Authorization") String token, @Validated @RequestParam String intro) {
         return userService.findById(jwtUtil.getId(token)).flatMap(oldUser ->

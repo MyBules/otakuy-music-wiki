@@ -35,9 +35,7 @@ public class Album {
     private Integer rating_count;
     private String owner;
     private DownloadRes downloadRes;
-
     private String status;
     private Boolean isRecommend;
-
     private String createTime;
 }

@@ -36,7 +36,7 @@ public class NotificationController {
     @GetMapping("/notifications/noRead")
     public Mono<ResponseEntity<Result<Long>>> getNotificationsStatus(@RequestHeader("Authorization") String token) {
         return notificationService.countByIsReadAndOwner(jwtUtil.getId(token)).map(count -> {
-            if (count!=0)
+            if (count != 0)
                 return ResponseEntity.ok().body(new Result<>("有未读消息", count));
             return ResponseEntity.ok().body(new Result<>("无未读消息", count));
         });

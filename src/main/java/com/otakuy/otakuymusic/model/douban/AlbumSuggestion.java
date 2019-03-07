@@ -10,5 +10,4 @@ public class AlbumSuggestion {
     private String title;
     private String douban_id;
     private String cover;
-
 }

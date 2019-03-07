@@ -16,7 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -27,7 +29,12 @@ public class AdminController { //暂时只做专辑审核以及查看专辑,用�
     private final UserService userService;
     private final NotificationService notificationService;
 
-    //设置推荐专辑
+    //修改专辑推荐状态
+    @PostMapping("/albums/recommend")
+    public Mono<ResponseEntity<Result<String>>> modifyIsRecommend(@RequestBody() Album[] albums, @RequestParam Boolean isRecommend) {
+        return albumService.updateIsRecommend(Arrays.stream(albums).parallel().map(Album::getId).collect(Collectors.toList()), isRecommend).map(updateResult -> ResponseEntity.ok().body(new Result<>("修改专辑推荐属性成功")));
+    }
+
     //专辑审核
     @GetMapping("/albums/{album_id}/auditing")
     public Mono<ResponseEntity<Result<String>>> auditingAlbum(@PathVariable("album_id") String album_id, @RequestParam String status) {
