@@ -69,10 +69,6 @@ public class JWTUtil implements Serializable {
         return !isTokenExpired(token);
     }
 
-   /* public Integer getStar(String token) {
-        return getAllClaimsFromToken(token.substring(7)).get("star", Integer.class);
-    }*/
-
     public String getId(String token) {
         return getAllClaimsFromToken(token.substring(7)).get("id",String.class);
     }

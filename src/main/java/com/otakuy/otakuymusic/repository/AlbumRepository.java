@@ -2,6 +2,7 @@ package com.otakuy.otakuymusic.repository;
 
 import com.otakuy.otakuymusic.model.Album;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -45,4 +46,7 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
 
     @Query(value = "{'status': ?0}", fields = "{'title' : 1,'cover' : 1,'artists' : 1,'owner' : 1,'createTime' : 1}")
     Flux<Album> findAllByStatus(String status, Pageable pageable);
+
+    @CountQuery("{'status': ?0}")
+    Mono<Long> countAllByStatus(String status);
 }

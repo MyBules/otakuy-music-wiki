@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,13 @@ public class AdminController { //暂时只做专辑审核以及查看专辑,用�
     //拉取专辑(审核通过/没通过/待审核)
     @GetMapping("/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> getAlbumList(@RequestParam String status, @RequestParam Integer page) {
-        return albumService.findAllByStatus(status, PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok().body(new Result<>("拉取专辑列表成功", albums)));
+        return albumService.findAllByStatus(status, PageRequest.of(page, 4, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok().body(new Result<>("拉取专辑列表成功", albums)));
+    }
+
+    //拉取专辑总数(审核通过/没通过/待审核)
+    @GetMapping("/albumsCount")
+    public Mono<ResponseEntity<Result<Long>>> getAlbumsCount(@RequestParam String status) {
+        return albumService.countAllByStatus(status).map(sum -> ResponseEntity.ok().body(new Result<>("统计专辑数量成功", sum)));
     }
 
     //拉取用户(被block/未被block)
@@ -55,4 +62,25 @@ public class AdminController { //暂时只做专辑审核以及查看专辑,用�
     public Mono<ResponseEntity<Result<List<User>>>> getUserList(@RequestParam Boolean isEnable, @RequestParam Integer page) {
         return userService.findAllByEnabled(isEnable, PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(users -> ResponseEntity.ok().body(new Result<>("拉取用户列表成功", users)));
     }
+
+    //拉取用户总数(被block/未被block)
+    @GetMapping("/usersCount")
+    public Mono<ResponseEntity<Result<Long>>> getUsersCount(@RequestParam Boolean isEnable) {
+        return userService.countAllByEnabled(isEnable).map(sum -> ResponseEntity.ok().body(new Result<>("统计用户数量成功", sum)));
+    }
+
+    //拉取评论总数
+    @GetMapping("/notificationCount")
+    public Mono<ResponseEntity<Result<Long>>> getNotificationCount() {
+        return notificationService.countAll().map(sum -> ResponseEntity.ok().body(new Result<>("统计回复数量成功", sum)));
+    }
+
+    //拉取专辑信息
+    @GetMapping("/albums/{album_id}")
+    public Mono<ResponseEntity<Result<Album>>> getAlbumDetail(@PathVariable("album_id") String album_id) {
+        return albumService.findById(album_id).map(album -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("拉取专辑详细成功", album))).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
+    }
+
+
+
 }

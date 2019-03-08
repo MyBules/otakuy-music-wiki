@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -55,19 +56,6 @@ public class AlbumService {
     public Mono<Album> add(Album album) {
         return albumRepository.save(album);
     }
-
-    /*    public Flux<Album> findAllByTitle(String title) {
-            Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
-            Query query = Query.query(Criteria.where("title").regex(pattern));
-            return reactiveMongoTemplate.find(query, Album.class, "album");
-        }*/
-
-/*    //按照条件查找
-    public Flux<Album> findAllByFilter(String filter, String param) {
-        Pattern pattern = Pattern.compile("^.*" + param + ".*$", Pattern.CASE_INSENSITIVE);
-        Query query = Query.query(Criteria.where(filter).regex(pattern));
-        return reactiveMongoTemplate.find(query, Album.class, "album").filter(album -> !album.getStatus().equals("reject"));
-    }*/
 
     //获取专辑建议
     public List<AlbumSuggestion> getAlbumSuggestionByDouban(String title) throws UnsupportedEncodingException {
@@ -157,5 +145,10 @@ public class AlbumService {
     public Mono<UpdateResult> updateIsRecommend(List<String> albums, Boolean isRecommend) {
         return reactiveMongoTemplate.updateMulti(new Query(where("_id").in(albums)),
                 new Update().set("isRecommend", isRecommend), Album.class);
+    }
+
+    public Mono<Long> countAllByStatus(String status) {
+
+        return albumRepository.countAllByStatus(status);
     }
 }

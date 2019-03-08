@@ -96,4 +96,8 @@ public class UserService {
     public Mono<User> findAvatarById(String id) {
         return userRepository.findAvatarById(id);
     }
+
+    public Mono<Long> countAllByEnabled(Boolean isEnable) {
+        return userRepository.countAllByEnabled(isEnable);
+    }
 }

@@ -2,6 +2,7 @@ package com.otakuy.otakuymusic.repository;
 
 import com.otakuy.otakuymusic.model.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,7 @@ public interface UserRepository extends ReactiveMongoRepository<User, String> {
 
     @Query(value = "{'_id': ?0}", fields = "{'avatar' : 1,'_id' : 0}")
     Mono<User> findAvatarById(String id);
+
+    @CountQuery("{'enabled': ?0}")
+    Mono<Long> countAllByEnabled(Boolean isEnable);
 }

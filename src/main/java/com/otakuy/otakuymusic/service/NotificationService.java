@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -39,5 +40,9 @@ public class NotificationService {
     public Mono<UpdateResult> updateAllToIsRead(List<Notification> notifications) {
         return reactiveMongoTemplate.updateMulti(new Query(where("_id").in(notifications.stream().parallel().map(Notification::getId).collect(Collectors.toList()))),
                 new Update().set("isRead", true), Notification.class);
+    }
+
+    public Mono<Long> countAll() {
+        return notificationRepository.count();
     }
 }
