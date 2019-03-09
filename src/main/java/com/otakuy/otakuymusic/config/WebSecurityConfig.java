@@ -56,7 +56,7 @@ public class WebSecurityConfig {
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                .pathMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+                .pathMatchers(HttpMethod.POST, "/login", "/admin/login", "/register").permitAll()
                 .pathMatchers(HttpMethod.PUT, "/users/password").permitAll()
                 .pathMatchers(HttpMethod.GET, "/albums", "/check/emails", "/check/usernames", "/verificationCode", "/albums/recommendAlbum", "/forgetPassword", "/test").permitAll()
                 .anyExchange().authenticated()
@@ -132,6 +132,9 @@ public class WebSecurityConfig {
     CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.addAllowedOrigin("https://otakuy.com");
+        config.addAllowedOrigin("https://m.otakuy.com");
+        config.addAllowedOrigin("https://admin.otakuy.com");
         config.addAllowedOrigin("http://localhost:63342");
         config.addAllowedHeader("*");
         config.addExposedHeader("Authorization");

@@ -51,7 +51,7 @@ public class UserService {
 
     //上传(更新)头像
     public String uploadAvatar(String user_id, FilePart filePart) throws IOException {
-        uploadImageUtil.uploadImage(filePart, "E:\\123\\" + user_id + ".png", () -> {
+        uploadImageUtil.uploadImage(filePart, "/home/www/avatar.otakuy.com/" + user_id + ".png", () -> {
             userRepository.findById(user_id).flatMap(user -> {
                 user.setAvatar("https://avatar.otakuy.com/" + user_id + ".png");
                 return userRepository.save(user);

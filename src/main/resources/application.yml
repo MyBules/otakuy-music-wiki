@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8080
 encoder:
   secret: 生蚝QAQ只是一位兴趣使然的面向ACG编程人员(●'◡'●)ﾉ♥♥♥♥♥♥
   iteration: 20

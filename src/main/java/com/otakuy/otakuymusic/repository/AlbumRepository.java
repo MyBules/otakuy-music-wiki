@@ -44,9 +44,12 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query(value = "{'isRecommend': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByIsRecommend(Boolean isRecommend);
 
-    @Query(value = "{'status': ?0}", fields = "{'title' : 1,'cover' : 1,'artists' : 1,'owner' : 1,'createTime' : 1}")
+    @Query(value = "{'status': ?0}", fields = "{'title' : 1,'cover' : 1,'artists' : 1,'owner' : 1,'createTime' : 1,'isRecommend' : 1}")
     Flux<Album> findAllByStatus(String status, Pageable pageable);
 
     @CountQuery("{'status': ?0}")
     Mono<Long> countAllByStatus(String status);
+
+    @CountQuery("{'isRecommend': ?0}")
+    Mono<Long> countAllByIsRecommend(Boolean isRecommend);
 }

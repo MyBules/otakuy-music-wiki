@@ -34,13 +34,13 @@ public class AlbumController {
     public Mono<ResponseEntity<Result<List<Album>>>> getAlbumList(@RequestParam String filter, @RequestParam String param, @RequestParam Integer page) {
         switch (filter) {
             case "byTime":
-                return albumService.findAllByStatus("active", PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok().body(new Result<>("拉取专辑列表成功", albums)));
+                return albumService.findAllByStatus("active", PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok().body(new Result<>("拉取专辑列表成功", albums)));
             case "byTitle":
-                return albumService.findAllByTitleAndStatusActive(param, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
+                return albumService.findAllByTitleAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
             case "byTag":
-                return albumService.findAllByTagAndStatusActive(param, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
+                return albumService.findAllByTagAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
             case "byArtist":
-                return albumService.findAllByArtistAndStatusActive(param, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
+                return albumService.findAllByArtistAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
         }
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("过滤条件不存在")));
     }

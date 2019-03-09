@@ -69,7 +69,7 @@ public class AlbumService {
 
     //上传(更新)专辑封面
     public String uploadCover(String album_id, FilePart filePart) throws IOException {
-        uploadImageUtil.uploadImage(filePart, "E:\\123\\" + album_id + ".png", () -> {
+        uploadImageUtil.uploadImage(filePart, "/home/www/cover.otakuy.com/" + album_id + ".png", () -> {
             albumRepository.findById(album_id).flatMap(album -> {
                 album.setCover("https://cover.otakuy.com/" + album_id + ".png");
                 return albumRepository.save(album);
@@ -148,7 +148,15 @@ public class AlbumService {
     }
 
     public Mono<Long> countAllByStatus(String status) {
-
         return albumRepository.countAllByStatus(status);
+    }
+
+    public Mono<Long> countAllByIsRecommend(Boolean isRecommend) {
+        return albumRepository.countAllByIsRecommend(isRecommend);
+    }
+
+    public Mono<UpdateResult> updateStatus(List<String> albums, String status) {
+        return reactiveMongoTemplate.updateMulti(new Query(where("_id").in(albums)),
+                new Update().set("status", status), Album.class);
     }
 }
