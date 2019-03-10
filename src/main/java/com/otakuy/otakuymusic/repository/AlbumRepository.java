@@ -14,6 +14,9 @@ public interface AlbumRepository extends ReactiveMongoRepository<Album, String> 
     @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByOwner(String owner, Pageable pageable);
 
+    @Query(value = "{'owner': ?0}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
+    Flux<Album> findAllByOwner(String owner);
+
     @Query(value = "{'owner': ?0 ,'status': { '$ne' : \"reject\"}}", fields = "{'title' : 1,'intro' : 1,'cover' : 1,'artists' : 1}")
     Flux<Album> findAllByOwnerAndStatusNotReject(String owner, Pageable pageable);
 

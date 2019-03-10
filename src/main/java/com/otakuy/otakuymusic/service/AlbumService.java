@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -39,6 +38,10 @@ public class AlbumService {
     private final UploadImageUtil uploadImageUtil;
     private final JWTUtil jwtUtil;
     private final AlbumUtil albumUtil;
+
+    public Flux<Album> findAllByOwner(String owner) {
+        return albumRepository.findAllByOwner(owner);
+    }
 
     public Flux<Album> findAllByOwner(String owner, Pageable pageable) {
         return albumRepository.findAllByOwner(owner, pageable);

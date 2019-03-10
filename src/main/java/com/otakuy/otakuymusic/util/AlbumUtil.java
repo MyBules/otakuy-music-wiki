@@ -2,6 +2,7 @@ package com.otakuy.otakuymusic.util;
 
 import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.model.Album;
+import com.otakuy.otakuymusic.model.DownloadRes;
 import com.otakuy.otakuymusic.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class AlbumUtil {
 
     //新增专辑初始化
     public Album initNew(String token, Album album) {
+        album.setId(null);
         album.setOwner(jwtUtil.getId(token));
         album.setRating_count(0);
         album.setRating(0F);
@@ -25,6 +27,8 @@ public class AlbumUtil {
         album.setIsRecommend(false);
         album.setCover("https://cover.otakuy.com/default.png");
         album.setCreateTime(DateFormat.getDateInstance().format(new Date()));
+        if (album.getDownloadRes() == null)
+            album.setDownloadRes(new DownloadRes());
         return album;
     }
 
@@ -42,7 +46,7 @@ public class AlbumUtil {
         oldAlbum.setVersion(album.getVersion());
         oldAlbum.setTags(album.getTags());
         oldAlbum.setIntro(album.getIntro());
-        oldAlbum.setCover(album.getCover());
+        //    oldAlbum.setCover(album.getCover());
         oldAlbum.setDouban_url(album.getDouban_url());
         oldAlbum.setCode(album.getCode());
         oldAlbum.setDownloadRes(album.getDownloadRes());

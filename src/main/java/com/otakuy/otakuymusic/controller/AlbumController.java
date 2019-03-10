@@ -101,7 +101,7 @@ public class AlbumController {
     //查找指定用户的所有维护的专辑(包含通过与没通过)
     @GetMapping("/uers/{owner}/albums")
     public Mono<ResponseEntity<Result<List<Album>>>> findAllByOwner(@PathVariable("owner") String owner, @RequestParam Integer page) {
-        return albumService.findAllByOwner(owner, PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张维护专辑", albums))).defaultIfEmpty(ResponseEntity.ok(new Result<>("该用户不存在或者没有专辑", null)));
+        return albumService.findAllByOwner(owner).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张维护专辑", albums))).defaultIfEmpty(ResponseEntity.ok(new Result<>("该用户不存在或者没有专辑", null)));
     }
 
     //查找指定用户的所有维护的专辑(包含通过)
