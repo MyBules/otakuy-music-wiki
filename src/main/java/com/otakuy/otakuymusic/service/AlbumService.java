@@ -4,6 +4,7 @@ import com.mongodb.client.result.UpdateResult;
 import com.otakuy.otakuymusic.exception.CheckException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
+import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.repository.AlbumRepository;
 import com.otakuy.otakuymusic.util.AlbumUtil;
@@ -11,6 +12,7 @@ import com.otakuy.otakuymusic.util.DoubanApi.DoubanUtil;
 import com.otakuy.otakuymusic.util.JWTUtil;
 import com.otakuy.otakuymusic.util.UploadImageUtil;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -71,15 +73,13 @@ public class AlbumService {
     }
 
     //上传(更新)专辑封面
-    public String uploadCover(String album_id, FilePart filePart) throws IOException {
-        uploadImageUtil.uploadImage(filePart, "/home/www/cover.otakuy.com/" + album_id + ".png", () -> {
-            albumRepository.findById(album_id).flatMap(album -> {
-                album.setCover("https://cover.otakuy.com/" + album_id + ".png");
-                return albumRepository.save(album);
-            }).subscribe();
-            System.out.println("更新完成");
-        });
-        return "https://cover.otakuy.com/" + album_id + ".png";
+    public Mono<@URL String> uploadCover(String album_id, FilePart filePart) throws IOException {
+        String path = "/home/www/cover.otakuy.com/" + album_id + ".png";
+        return Mono.when(uploadImageUtil.uploadImage(filePart, path)).then(uploadImageUtil.uploadImg(path).flatMap(url -> albumRepository.findById(album_id).flatMap(album -> {
+            album.setCover(url);
+            return albumRepository.save(album);
+        }))).map(Album::getCover);
+
     }
 
     //获取首页展示专辑
@@ -148,6 +148,11 @@ public class AlbumService {
     public Mono<UpdateResult> updateIsRecommend(List<String> albums, Boolean isRecommend) {
         return reactiveMongoTemplate.updateMulti(new Query(where("_id").in(albums)),
                 new Update().set("isRecommend", isRecommend), Album.class);
+    }
+
+    public Mono<UpdateResult> updateOwnerAvatar(User owner) {
+        return reactiveMongoTemplate.updateMulti(new Query(where("owner").is(owner.getId())),
+                new Update().set("ownerAvatar", owner.getAvatar()), Album.class);
     }
 
     public Mono<Long> countAllByStatus(String status) {

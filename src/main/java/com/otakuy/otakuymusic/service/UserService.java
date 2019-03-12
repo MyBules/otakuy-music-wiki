@@ -50,15 +50,12 @@ public class UserService {
     }
 
     //上传(更新)头像
-    public String uploadAvatar(String user_id, FilePart filePart) throws IOException {
-        uploadImageUtil.uploadImage(filePart, "/home/www/avatar.otakuy.com/" + user_id + ".png", () -> {
-            userRepository.findById(user_id).flatMap(user -> {
-                user.setAvatar("https://avatar.otakuy.com/" + user_id + ".png");
-                return userRepository.save(user);
-            }).subscribe();
-            System.out.println("更新完成");
-        });
-        return "https://avatar.otakuy.com/" + user_id + ".png";
+    public Mono<User> uploadAvatar(String user_id, FilePart filePart) throws IOException {
+        String path = "/home/www/avatar.otakuy.com/" + user_id + ".png";
+        return Mono.when(uploadImageUtil.uploadImage(filePart, path)).then(uploadImageUtil.uploadImg(path).flatMap(url -> userRepository.findById(user_id).flatMap(user -> {
+            user.setAvatar(url);
+            return userRepository.save(user);
+        })));
     }
 
     public Mono<User> findById(String user_id) {

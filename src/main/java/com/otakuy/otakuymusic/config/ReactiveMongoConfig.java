@@ -18,6 +18,6 @@ public class ReactiveMongoConfig {
 
     @Bean
     public ReactiveMongoTemplate reactiveMongoTemplate() {
-        return new ReactiveMongoTemplate(mongoClient, "123");
+        return new ReactiveMongoTemplate(mongoClient, "otakuy-music-wiki");
     }
 }

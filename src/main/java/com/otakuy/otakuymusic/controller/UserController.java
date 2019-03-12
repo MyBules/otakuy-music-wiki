@@ -5,6 +5,7 @@ import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.User;
 import com.otakuy.otakuymusic.model.security.AuthRequest;
 import com.otakuy.otakuymusic.model.security.Role;
+import com.otakuy.otakuymusic.service.AlbumService;
 import com.otakuy.otakuymusic.service.EmailService;
 import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.service.VerificationCodeService;
@@ -36,6 +37,7 @@ public class UserController {
     private final UserUtil userUtil;
     private final PBKDF2Encoder passwordEncoder;
     private final UserService userService;
+    private final AlbumService albumService;
     private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
 
@@ -61,7 +63,6 @@ public class UserController {
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("用户不存在")));
     }
 
-
     //用户注册
     @PostMapping("/register")
     public Mono<ResponseEntity<Result<?>>> userRegister(@RequestHeader("verificationCode") String verificationCode, @RequestHeader("verificationCodeId") String verificationCodeId, @Valid @RequestBody User user) {
@@ -84,7 +85,8 @@ public class UserController {
     //更改头像
     @PostMapping(value = "/users/{user_id}/avatars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadAvatar(@RequestHeader("Authorization") String token, @RequestPart("file") FilePart filePart) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("上传头像成功", userService.uploadAvatar(jwtUtil.getId(token), filePart))));
+        System.out.println(filePart.filename());
+        return userService.uploadAvatar(jwtUtil.getId(token), filePart).flatMap(user -> albumService.updateOwnerAvatar(user).map(updateResult -> ResponseEntity.ok(new Result<>("上传头像成功", user.getAvatar()))));
     }
 
     //申请重置密码

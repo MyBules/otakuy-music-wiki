@@ -4,6 +4,7 @@ import com.otakuy.otakuymusic.exception.AuthorityException;
 import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.DownloadRes;
 import com.otakuy.otakuymusic.model.Result;
+import com.otakuy.otakuymusic.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,14 +19,15 @@ public class AlbumUtil {
     private final JWTUtil jwtUtil;
 
     //新增专辑初始化
-    public Album initNew(String token, Album album) {
+    public Album initNew(User user, Album album) {
         album.setId(null);
-        album.setOwner(jwtUtil.getId(token));
+        album.setOwner(user.getId());
+        album.setOwnerAvatar(user.getAvatar());
         album.setRating_count(0);
         album.setRating(0F);
         album.setStatus("block");
         album.setIsRecommend(false);
-        album.setCover("https://cover.otakuy.com/default.png");
+        album.setCover("https://ws4.sinaimg.cn/large/006346uDgy1g0z824nq5tj30i60i7gli.jpg");
         album.setCreateTime(DateFormat.getDateInstance().format(new Date()));
         if (album.getDownloadRes() == null)
             album.setDownloadRes(new DownloadRes());

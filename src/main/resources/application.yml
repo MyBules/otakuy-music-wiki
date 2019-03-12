@@ -11,7 +11,7 @@ spring:
   data:
     mongodb:
       database: 123
-      uri: mongodb://localhost:27017/123
+      uri: mongodb://worker01:27017/otakuy-music-wiki
   mail:
     host: smtp.qq.com
     username: 403827354@qq.com
@@ -28,5 +28,6 @@ douban:
   authorization: Bearer 3b436c09829cb2e6b1ca441c87d618b2
 mail:
   content:
-
-
+sina:
+  username:
+  password:

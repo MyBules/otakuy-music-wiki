@@ -34,6 +34,7 @@ public class Album {
     private Float rating;
     private Integer rating_count;
     private String owner;
+    private String ownerAvatar;
     private DownloadRes downloadRes;
     private String status;
     private Boolean isRecommend;

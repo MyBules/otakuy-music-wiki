@@ -4,7 +4,9 @@ import com.otakuy.otakuymusic.model.Album;
 import com.otakuy.otakuymusic.model.Result;
 import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import com.otakuy.otakuymusic.service.AlbumService;
+import com.otakuy.otakuymusic.service.UserService;
 import com.otakuy.otakuymusic.util.AlbumUtil;
+import com.otakuy.otakuymusic.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,9 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlbumController {
     private final AlbumService albumService;
+    private final UserService userService;
     private final AlbumUtil albumUtil;
+    private final JWTUtil jwtUtil;
 
     //按照条件拉取活跃状态专辑列表
     @GetMapping("/albums")
@@ -48,7 +52,8 @@ public class AlbumController {
     //增加新的专辑
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
-        return albumService.create(albumUtil.initNew(token, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("新的维护创建成功,等待审核", newAlbum)));
+        return userService.findById(jwtUtil.getId(token)).flatMap(user -> albumService.create(albumUtil.initNew(user, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("新的维护创建成功,等待审核", newAlbum))));
+
     }
 
     //删除专辑(审核不通过专辑也可以删除)
@@ -56,7 +61,6 @@ public class AlbumController {
     public Mono<ResponseEntity<Result<String>>> delete(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id) {
         return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
-            // albumService.delete(album).subscribe();
             return albumService.delete(album).map(x -> ResponseEntity.status(HttpStatus.OK).body(new Result<String>("删除成功")));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
@@ -66,8 +70,6 @@ public class AlbumController {
     public Mono<ResponseEntity<Result<Album>>> update(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @Validated @RequestBody Album album) {
         return albumService.findById(album_id).flatMap(oldAlbum -> {
             albumUtil.checkAuthority(token, oldAlbum);
-            //   Album newAlbum = albumUtil.update(oldAlbum, album);
-            //  albumService.save(albumUtil.update(oldAlbum, album)).subscribe();
             return albumService.save(albumUtil.update(oldAlbum, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.OK).body(new Result<>("更新成功", newAlbum)));
         }).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("专辑不存在")));
     }
@@ -75,15 +77,14 @@ public class AlbumController {
     //上传指定专辑的封面
     @PutMapping(value = "/albums/{album_id}/covers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<Result<String>>> uploadCover(@RequestHeader("Authorization") String token, @PathVariable("album_id") String album_id, @RequestPart("file") FilePart filePart) throws IOException {
-        return albumService.findById(album_id).map(album -> {
+        return albumService.findById(album_id).flatMap(album -> {
             albumUtil.checkAuthority(token, album);
-            String url = null;
             try {
-                url = albumService.uploadCover(album_id, filePart);
+                return albumService.uploadCover(album_id, filePart).map(url -> ResponseEntity.ok(new Result<>("上传专辑封面成功", url)));
             } catch (IOException e) {
                 e.printStackTrace();
+                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("上传专辑封面失败")));
             }
-            return ResponseEntity.ok(new Result<>("上传专辑封面成功", url));
         });
     }
 
@@ -127,11 +128,5 @@ public class AlbumController {
     public Mono<ResponseEntity<Result<Album>>> getAlbumDetailByDouban(@PathVariable("douban_id") String douban_id) throws IOException {
         return Mono.just(ResponseEntity.ok(new Result<>("拉取成功", albumService.getAlbumDetailByDouban(douban_id))));
     }
-
-    /*    //确认修改
-        @PostMapping("/test")
-        public Mono<ResponseEntity<Result<Album>>> test(@RequestHeader("Authorization") String token, @RequestBody Revision revision) {
-            return albumService.modify(revision).map(album -> ResponseEntity.ok(new Result<>(null, album)));
-        }*/
 
 }
