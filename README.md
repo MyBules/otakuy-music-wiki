@@ -2,7 +2,7 @@
 # otakuy-music-wiki
 ***
 
-[otakuy-music-wiki](https://otakuy,com)(宅乐(yue)维基)
+[otakuy-music-wiki](https://otakuy.com)(宅乐(yue)维基)
 
 以音乐专辑百科信息为文章单位,人人可以参与维护修正的虚拟社区
 

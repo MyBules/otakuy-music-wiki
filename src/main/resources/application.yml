@@ -24,6 +24,9 @@ spring:
           starttls:
             enable: true
             required: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
 douban:
   authorization: Bearer 3b436c09829cb2e6b1ca441c87d618b2
 mail:

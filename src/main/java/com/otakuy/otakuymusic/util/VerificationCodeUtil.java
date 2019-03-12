@@ -76,7 +76,7 @@ public class VerificationCodeUtil {
         Graphics g = bufferedImage.getGraphics();
         g.setColor(getRandColor(250, 255));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.setFont(new Font("Fixedsys", Font.BOLD, fontHeight));
+        g.setFont(new Font("Arial", Font.BOLD, fontHeight));
         for (int i = 0; i < LINE_COUNT; i++) {
             int xs = random.nextInt(WIDTH);
             int ys = random.nextInt(HEIGHT);

@@ -30,7 +30,7 @@ public class EmailUtil {
         helper.setFrom("Otakuy.com<403827354@qq.com>");
         helper.setTo(emailAddr);
         helper.setSubject("来自Otakuy.com的验证请求");
-        helper.setText(pre+"https://otakuy.com/modifyPassword?id="+verificationCode.getId()+"&code="+verificationCode.getCode()+"&email="+emailAddr+pos, true);
+        helper.setText(pre + "https://otakuy.com/resetPwd?id=" + verificationCode.getId() + "&code=" + verificationCode.getCode() + "&email=" + emailAddr + pos, true);
         return Mono.just(message).doOnNext(mailSender::send);
     }
 }
