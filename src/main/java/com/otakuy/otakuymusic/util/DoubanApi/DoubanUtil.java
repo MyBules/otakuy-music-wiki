@@ -10,6 +10,7 @@ import com.otakuy.otakuymusic.model.douban.AlbumSuggestion;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,7 +19,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,33 +36,41 @@ public class DoubanUtil {
                 .defaultHeader("User-Agent", "api-client/0.1.3 com.douban.frodo/6.9.1 iOS/12.1.3 model/iPhone7,2 network/wifi")
                 .defaultHeader("Authorization", authorization)
                 .defaultHeader("Accept-Language", " zh-Hans-CN;q=1, ja-JP;q=0.9")
-                .defaultUriVariables(Collections.singletonMap("url", "https://frodo.douban.com"))
                 .build();
         suggestionPattern = Pattern.compile("(?<=(?:\"title\": \"|music\\\\/|\"cover_url\": \")).+?(?=\")");
     }
 
-    public List<AlbumSuggestion> getAlbumSuggestion(String title) throws UnsupportedEncodingException {
-        String result = Objects.requireNonNull(webclient.get()
-                .uri(URI.create("https://frodo.douban.com/api/v2/search/music?count=15&q=" + URLEncoder.encode(title, "UTF-8") + "&start=0&version=6.9.1&sort=T"))
-                .exchange().block())
-                .bodyToMono(String.class).block();
-        assert result != null;
-        Matcher m = suggestionPattern.matcher(result);
-        Object[] matchResults = m.results().map(MatchResult::group).toArray();
-        List<AlbumSuggestion> albumSuggestions = new ArrayList<>();
-        int length = matchResults.length;
-        for (int i = 0; i < length; i = i + 3) {
-            albumSuggestions.add(new AlbumSuggestion(unicodeToString(matchResults[i].toString()), matchResults[i + 1].toString(), matchResults[i + 2].toString().replace("\\", "")));
-        }
-        return albumSuggestions;
+    public Mono<List<AlbumSuggestion>> getAlbumSuggestion(String title) throws UnsupportedEncodingException {
+        return webclient.get()
+                .uri(URI.create("https://frodo.douban.com/api/v2/search/music?apikey=0ab215a8b1977939201640fa14c66bab&count=15&q=" + URLEncoder.encode(title, "UTF-8") + "&start=0&version=6.9.1&sort=T"))
+                .retrieve()
+                .bodyToMono(String.class).map(s -> {
+                    if (s != null) {
+                        Object[] matchResults = suggestionPattern.matcher(s).results().map(MatchResult::group).toArray();
+                        List<AlbumSuggestion> albumSuggestions = new ArrayList<>();
+                        int length = matchResults.length;
+                        for (int i = 0; i < length; i = i + 3) {
+                            albumSuggestions.add(new AlbumSuggestion(unicodeToString(matchResults[i].toString()), matchResults[i + 1].toString(), matchResults[i + 2].toString().replace("\\", "")));
+                        }
+                        return albumSuggestions;
+                    }
+                    throw new RuntimeException();
+                });
     }
 
-    public Album getAlbumDetail(String douban_id) throws IOException {
-        String result = Objects.requireNonNull(webclient.get()
-                .uri(URI.create("https://frodo.douban.com/api/v2/music/" + douban_id))
-                .exchange().block())
-                .bodyToMono(String.class).block();
-        return jsonToAlbum(result, douban_id);
+    public Mono<Album> getAlbumDetail(String douban_id) throws IOException {
+        return webclient.get()
+                .uri(URI.create("https://frodo.douban.com/api/v2/music/" + douban_id + "?apikey=0ab215a8b1977939201640fa14c66bab"))
+                .retrieve()
+                .bodyToMono(String.class).map(s -> {
+                    try {
+                        return jsonToAlbum(s, douban_id);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    throw new RuntimeException();
+                });
+
     }
 
     private static String unicodeToString(String unicodeString) {
@@ -93,11 +101,11 @@ public class DoubanUtil {
         //介绍
         album.setIntro(rootNode.path("intro").asText());
         //流派
-        album.setGenres(rootNode.path("genres").toString().toString().replace("\"]","").replace("[\"",""));
+        album.setGenres(rootNode.path("genres").toString().toString().replace("\"]", "").replace("[\"", ""));
         //标题
         album.setTitle(rootNode.path("title").asText());
         //类型
-        album.setVersion(rootNode.path("version").toString().toString().replace("\"]","").replace("[\"",""));
+        album.setVersion(rootNode.path("version").toString().toString().replace("\"]", "").replace("[\"", ""));
         //标签
         ArrayList<Tag> tagList = new ArrayList<>();
         for (JsonNode tag : rootNode.path("tags")) {
@@ -105,7 +113,7 @@ public class DoubanUtil {
         }
         album.setTags(tagList);
         //发行者
-        album.setPublisher(rootNode.path("publisher").toString().replace("\"]","").replace("[\"",""));
+        album.setPublisher(rootNode.path("publisher").toString().replace("\"]", "").replace("[\"", ""));
         //艺术家
         ArrayList<Artist> artistList = new ArrayList<>();
         for (JsonNode tag : rootNode.path("singer")) {

@@ -120,13 +120,13 @@ public class AlbumController {
     //依赖豆瓣api根据指定专辑名匹配专辑
     @GetMapping("/douban")
     public Mono<ResponseEntity<Result<List<AlbumSuggestion>>>> getAlbumSuggestionByDouban(@RequestParam String title) throws UnsupportedEncodingException {
-        return Mono.just(ResponseEntity.ok(new Result<>("以下是搜索建议", albumService.getAlbumSuggestionByDouban(title))));
+        return albumService.getAlbumSuggestionByDouban(title).map(albumSuggestions -> ResponseEntity.ok(new Result<>("以下是搜索建议", albumSuggestions)));
     }
 
     //依赖豆瓣api获取专辑详细信息
     @GetMapping("/douban/{douban_id}")
     public Mono<ResponseEntity<Result<Album>>> getAlbumDetailByDouban(@PathVariable("douban_id") String douban_id) throws IOException {
-        return Mono.just(ResponseEntity.ok(new Result<>("拉取成功", albumService.getAlbumDetailByDouban(douban_id))));
+        return albumService.getAlbumDetailByDouban(douban_id).map(album -> ResponseEntity.ok(new Result<>("拉取成功", album)));
     }
 
 }

@@ -63,12 +63,12 @@ public class AlbumService {
     }
 
     //获取专辑建议
-    public List<AlbumSuggestion> getAlbumSuggestionByDouban(String title) throws UnsupportedEncodingException {
+    public Mono<List<AlbumSuggestion>> getAlbumSuggestionByDouban(String title) throws UnsupportedEncodingException {
         return doubanUtil.getAlbumSuggestion(title);
     }
 
     //从豆瓣获取专辑详细信息
-    public Album getAlbumDetailByDouban(String douban_id) throws IOException {
+    public Mono<Album> getAlbumDetailByDouban(String douban_id) throws IOException {
         return doubanUtil.getAlbumDetail(douban_id);
     }
 

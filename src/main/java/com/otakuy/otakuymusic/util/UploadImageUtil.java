@@ -35,29 +35,29 @@ public class UploadImageUtil {
     private String cookie;
 
     public UploadImageUtil(@Value("${sina.username}") String username, @Value("${sina.password}") String password) {
-        formData = new LinkedMultiValueMap<>();
-        formData.add("entry", "sso");
-        formData.add("gateway", "1");
-        formData.add("from", "null");
-        formData.add("savestate", "30");
-        formData.add("useticket", "0");
-        formData.add("pagerefer", "");
-        formData.add("vsnf", "1");
-        formData.add("su", Base64.getEncoder().encodeToString(username.getBytes()));
-        formData.add("service", "sso");
-        formData.add("sp", password);
-        formData.add("sr", "1920*1080");
-        formData.add("encoding", "UTF-8");
-        formData.add("cdult", "3");
-        formData.add("domain", "sina.com.cn");
-        formData.add("prelt", "0");
-        formData.add("returntype", "TEXT");
+        formData = new LinkedMultiValueMap<>() {{
+            add("entry", "sso");
+            add("gateway", "1");
+            add("from", "null");
+            add("savestate", "30");
+            add("useticket", "0");
+            add("pagerefer", "");
+            add("vsnf", "1");
+            add("su", Base64.getEncoder().encodeToString(username.getBytes()));
+            add("service", "sso");
+            add("sp", password);
+            add("sr", "1920*1080");
+            add("encoding", "UTF-8");
+            add("cdult", "3");
+            add("domain", "sina.com.cn");
+            add("prelt", "0");
+            add("returntype", "TEXT");
+        }};
         setSinaCookies();
     }
 
     @Scheduled(cron = "0 0 */1 * * ?")
     public void setSinaCookies() {
-        System.out.println(cookie);
         WebClient.create()
                 .post()
                 .uri("https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)&_=1403138799543")

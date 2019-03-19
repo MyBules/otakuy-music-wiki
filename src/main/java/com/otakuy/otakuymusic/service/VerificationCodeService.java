@@ -27,7 +27,7 @@ public class VerificationCodeService {
     }
 
     public Mono<VerificationCodeUtil.VerificationCode> checkVerificationCode(VerificationCodeUtil.VerificationCode verificationCode) {
-        Query query = new Query(Criteria.where("_id").is(verificationCode.getId()).and("code").is(verificationCode.getCode()));
+        Query query = new Query(Criteria.where("_id").is(verificationCode.getId()).and("code").regex(verificationCode.getCode(), "i"));
         return reactiveMongoTemplate.findAndRemove(query, VerificationCodeUtil.VerificationCode.class, "verificationCode");
     }
 
