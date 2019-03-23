@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -47,7 +47,7 @@ public class Revision<T> {
 
     public static void init(Revision revision, String committerName, String committer) {
         revision.setCommitterName(committerName);
-        revision.setCreateTime(DateFormat.getDateInstance().format(new Date()));
+        revision.setCreateTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         revision.setCommitter(committer);
     }
 

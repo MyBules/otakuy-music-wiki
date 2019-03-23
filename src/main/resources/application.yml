@@ -28,7 +28,7 @@ spring:
             port: 465
             class: javax.net.ssl.SSLSocketFactory
 douban:
-  authorization:
+  authorization: Bearer 04d942e39740bf650e8bc8aac5c23e2f
 mail:
   content:
 sina:

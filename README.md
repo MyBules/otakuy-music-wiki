@@ -26,6 +26,8 @@
 * Reactive Spring Security & jjwt
 * Reactive Spring Data MongoDb
 
+* ![图片](https://wx4.sinaimg.cn/large/0069Zpkhgy1g1cotgpgbnj32s91lrwxu.jpg)
+
 分为音乐区与讨论区
 
 >  推荐系统:

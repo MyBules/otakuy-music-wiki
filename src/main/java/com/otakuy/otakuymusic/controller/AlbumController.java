@@ -44,7 +44,6 @@ public class AlbumController {
             case "byTag":
                 return albumService.findAllByTagAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
             case "byArtist":
-                return albumService.findAllByArtistAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
         }
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("过滤条件不存在")));
     }
@@ -53,7 +52,6 @@ public class AlbumController {
     @PostMapping("/albums")
     public Mono<ResponseEntity<Result<Album>>> create(@RequestHeader("Authorization") String token, @Validated @RequestBody Album album) {
         return userService.findById(jwtUtil.getId(token)).flatMap(user -> albumService.create(albumUtil.initNew(user, album)).map(newAlbum -> ResponseEntity.status(HttpStatus.CREATED).body(new Result<>("新的维护创建成功,等待审核", newAlbum))));
-
     }
 
     //删除专辑(审核不通过专辑也可以删除)

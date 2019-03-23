@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
@@ -28,7 +28,7 @@ public class AlbumUtil {
         album.setStatus("block");
         album.setIsRecommend(false);
         album.setCover("https://ws4.sinaimg.cn/large/006346uDgy1g0z824nq5tj30i60i7gli.jpg");
-        album.setCreateTime(DateFormat.getDateInstance().format(new Date()));
+        album.setCreateTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         if (album.getDownloadRes() == null)
             album.setDownloadRes(new DownloadRes());
         return album;

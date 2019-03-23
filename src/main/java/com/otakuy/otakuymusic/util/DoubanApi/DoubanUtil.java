@@ -104,6 +104,7 @@ public class DoubanUtil {
         album.setGenres(rootNode.path("genres").toString().toString().replace("\"]", "").replace("[\"", ""));
         //标题
         album.setTitle(rootNode.path("title").asText());
+
         //类型
         album.setVersion(rootNode.path("version").toString().toString().replace("\"]", "").replace("[\"", ""));
         //标签

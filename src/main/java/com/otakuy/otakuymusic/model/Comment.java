@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -31,7 +31,7 @@ public class Comment {
 
     public Comment init(User user) {
         this.from_id = user.getId();
-        this.createTime = DateFormat.getDateInstance().format(new Date());
+        this.createTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         this.from_username = user.getUsername();
         return this;
     }

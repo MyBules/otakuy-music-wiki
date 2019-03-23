@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -27,7 +27,7 @@ public class Notification {
         this.owner = owner;
         this.albumId = albumId;
         this.isRead = false;
-        this.creatTime = DateFormat.getDateInstance().format(new Date());
+        this.creatTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         this.content = (String) ACTIONMAP.get(content);
     }
 
