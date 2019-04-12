@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 encoder:
   secret: 生蚝QAQ只是一位兴趣使然的面向ACG编程人员(●'◡'●)ﾉ♥♥♥♥♥♥
   iteration: 20
@@ -32,5 +32,5 @@ douban:
 mail:
   content:
 sina:
-  username:
-  password:
+  username: 15507838938
+  password: linhao199741

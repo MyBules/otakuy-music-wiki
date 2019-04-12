@@ -44,6 +44,7 @@ public class AlbumController {
             case "byTag":
                 return albumService.findAllByTagAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
             case "byArtist":
+                return albumService.findAllByArtistAndStatusActive(param, PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, "id"))).collectList().map(albums -> ResponseEntity.ok(new Result<>("共有" + albums.size() + "张专辑", albums)));
         }
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result<>("过滤条件不存在")));
     }
