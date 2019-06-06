@@ -1,10 +1,8 @@
 package com.otakuy.otakuymusic.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +22,7 @@ public class EmailUtil {
         this.pos = "\" class=\"button button--green\" target=\"_blank\">Reset your password</a></td></tr></table></td></tr></table></td></tr></table><p>感谢,<br>来自Otakuy.com</p></td></tr></table></td></tr><tr><td><table class=\"email-footer\" align=\"center\" width=\"570\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content-cell\" align=\"center\"><p class=\"sub align-center\">&copy; 2019 Otakuy.com. All rights reserved.</p><p class=\"sub align-center\">                        Otakuy.com</p></td></tr></table></td></tr></table></td></tr></table></body></html>";
     }
 
-    public Mono<MimeMessage> sendVerificationEmail(String emailAddr,VerificationCodeUtil.VerificationCode  verificationCode) throws MessagingException {
+    public Mono<MimeMessage> sendVerificationEmail(String emailAddr, VerificationCodeUtil.VerificationCode verificationCode) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom("Otakuy.com<403827354@qq.com>");

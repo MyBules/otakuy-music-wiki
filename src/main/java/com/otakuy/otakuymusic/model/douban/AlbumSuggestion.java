@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 public class AlbumSuggestion {
+    private String cover;
     private String title;
     private String douban_id;
-    private String cover;
 }

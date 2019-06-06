@@ -35,8 +35,6 @@ public class CommentController {
     //提交评论
     @PostMapping("/albums/{album_id}/comments")
     public Mono<ResponseEntity<Result<Comment>>> pushComment(@RequestHeader("Authorization") String token, @Validated @RequestBody Comment comment) {
-        return userService.findById(jwtUtil.getId(token)).flatMap(user -> {
-            return commentService.save(comment.init(user)).flatMap(c -> notificationService.save(new Notification(comment.getTo_id(), comment.getAlbum(), "commentBeReply")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c))));
-        });
+        return userService.findById(jwtUtil.getId(token)).flatMap(user -> commentService.save(comment.init(user)).flatMap(c -> notificationService.save(new Notification(comment.getTo_id(), comment.getAlbum(), "commentBeReply")).map(notification -> ResponseEntity.ok(new Result<>("评论提交成功", c)))));
     }
 }
